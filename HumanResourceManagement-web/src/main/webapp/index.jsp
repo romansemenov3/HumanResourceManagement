@@ -23,7 +23,7 @@
         <c:choose>
             <c:when test="${content == null}">
                 <a href="country">Editor</a><br/>
-                <a href="load.jsp">load.jsp</a>
+                <a href="import/import.jsp">Import</a><br/>
             </c:when>
             <c:otherwise>                
                 <c:import url="${content}" />

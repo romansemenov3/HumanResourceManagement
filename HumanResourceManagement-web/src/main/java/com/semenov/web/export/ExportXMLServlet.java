@@ -3,13 +3,13 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.semenov.web.xml;
+package com.semenov.web.export;
 
 import com.semenov.core.data.xml.XMLException;
-import com.semenov.core.data.xml.XMLImport;
+import com.semenov.core.data.xml.XMLExport;
 import java.io.IOException;
+import java.io.OutputStream;
 import javax.ejb.EJB;
-import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -20,12 +20,11 @@ import javax.servlet.http.HttpServletResponse;
  *
  * @author Roman
  */
-@WebServlet(name = "ImportXMLServlet", urlPatterns = {"/import_xml"})
-@MultipartConfig(location="/tmp", fileSizeThreshold=1024*1024, maxFileSize=1024*1024*5, maxRequestSize=1024*1024*5*5)
-public class ImportXMLServlet extends HttpServlet {
+@WebServlet(name = "ExportXMLServlet", urlPatterns = {"/export_xml"})
+public class ExportXMLServlet extends HttpServlet {
 
-    @EJB (beanName="XMLImport")
-    XMLImport xmlImport;
+    @EJB (beanName="XMLExport")
+    XMLExport xmlExport;
     
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -40,16 +39,20 @@ public class ImportXMLServlet extends HttpServlet {
             throws ServletException, IOException {
         
         try
-        {
-            xmlImport.importXML();
+        {         
+            response.setContentType("text/plain");
+            response.setHeader("Content-Disposition", "attachment;filename=human_resource_management_data.xml");
+
+            OutputStream os = response.getOutputStream();
+            os.write(xmlExport.exportXML().getBytes());
+            os.flush();
+            os.close();
+            
         }catch(XMLException e)
         {
-            request.setAttribute("importResult", "Import error: " + e.getMessage());
+            request.setAttribute("error", "Export error: " + e.getMessage());
+            request.getRequestDispatcher("error.jsp").forward(request, response);
         }
-        
-        request.setAttribute("content", "xml/import_xml.jsp");
-        
-        request.getRequestDispatcher("index.jsp").forward(request, response);
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

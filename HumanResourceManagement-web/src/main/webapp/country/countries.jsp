@@ -15,7 +15,8 @@
         <th></th>
         <th></th>
         <th></th>
-        <th></th>
+        <th>XML</th>
+        <th>JSON</th>
     </tr>
     <c:forEach items="${countries}" var="country">
         <tr>
@@ -25,6 +26,7 @@
             <td><a href="/HumanResourceManagement-web/delete_country?id=${country.id}">Delete</a></td>
             <td><a href="/HumanResourceManagement-web/region?country_id=${country.id}">Regions</a></td>
             <td><a href="/HumanResourceManagement-web/export_xml?country_id=${country.id}">Export with content</a></td>
+            <td><a href="/HumanResourceManagement-web/export_json?country_id=${country.id}">Export with content</a></td>
         </tr>
     </c:forEach>
 </table>

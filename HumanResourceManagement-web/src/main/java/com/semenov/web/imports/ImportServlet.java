@@ -3,13 +3,15 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.semenov.web.xml;
+package com.semenov.web.imports;
 
+import com.semenov.core.data.json.JSONException;
+import com.semenov.core.data.json.JSONImport;
 import com.semenov.core.data.xml.XMLException;
-import com.semenov.core.data.xml.XMLExport;
+import com.semenov.core.data.xml.XMLImport;
 import java.io.IOException;
-import java.io.OutputStream;
 import javax.ejb.EJB;
+import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -20,11 +22,15 @@ import javax.servlet.http.HttpServletResponse;
  *
  * @author Roman
  */
-@WebServlet(name = "ExportXMLServlet", urlPatterns = {"/export_xml"})
-public class ExportXMLServlet extends HttpServlet {
+@WebServlet(name = "ImportServlet", urlPatterns = {"/import"})
+@MultipartConfig(location="/tmp", fileSizeThreshold=1024*1024, maxFileSize=1024*1024*5, maxRequestSize=1024*1024*5*5)
+public class ImportServlet extends HttpServlet {
 
-    @EJB (beanName="XMLExport")
-    XMLExport xmlExport;
+    @EJB (beanName="XMLImport")
+    XMLImport xmlImport;
+    
+    @EJB (beanName="JSONImport")
+    JSONImport jsonImport;
     
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -38,21 +44,33 @@ public class ExportXMLServlet extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
-        try
-        {         
-            response.setContentType("text/plain");
-            response.setHeader("Content-Disposition", "attachment;filename=human_resource_management_data.xml");
-
-            OutputStream os = response.getOutputStream();
-            os.write(xmlExport.exportXML().getBytes());
-            os.flush();
-            os.close();
-            
-        }catch(XMLException e)
+        switch(request.getParameter("DataImportType"))
         {
-            request.setAttribute("error", "Export error: " + e.getMessage());
-            request.getRequestDispatcher("error.jsp").forward(request, response);
+            case "XML": 
+                try
+                {
+                    xmlImport.importXML();
+                }catch(XMLException e)
+                {
+                    request.setAttribute("importResult", "Import error: " + e.getMessage());
+                }
+            break;
+            case "JSON":
+                try
+                {
+                    jsonImport.importJSON();
+                }catch(JSONException e)
+                {
+                    request.setAttribute("importResult", "Import error: " + e.getMessage());
+                }
+            break;
+            default:
+                request.setAttribute("importResult", "Import error: unknown data type.");
         }
+        
+        request.setAttribute("content", "import/import.jsp");
+        
+        request.getRequestDispatcher("index.jsp").forward(request, response);
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

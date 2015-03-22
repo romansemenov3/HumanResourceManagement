@@ -18,7 +18,8 @@
         <th></th>
         <th></th>
         <th></th>
-        <th></th>
+        <th>XML</th>
+        <th>JSON</th>
     </tr>
     <c:forEach items="${offices}" var="office">
         <tr>
@@ -29,7 +30,8 @@
             <td><a href="/HumanResourceManagement-web/office?id=${office.id}">Edit</a></td>
             <td><a href="/HumanResourceManagement-web/delete_office?id=${office.id}">Delete</a></td>
             <td><a href="/HumanResourceManagement-web/staff?office_id=${office.id}">Staff</a></td>
-            <td><a href="/HumanResourceManagement-web/export_xml?office_id=${country.id}">Export with content</a></td>
+            <td><a href="/HumanResourceManagement-web/export_xml?office_id=${office.id}">Export with content</a></td>
+            <td><a href="/HumanResourceManagement-web/export_json?office_id=${office.id}">Export with content</a></td>
         </tr>
     </c:forEach>
 </table>
