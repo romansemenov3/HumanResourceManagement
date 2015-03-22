@@ -24,7 +24,7 @@ import javax.xml.transform.TransformerFactory;
 
 /**
  * The class <code>XMLBean</code> represents common XML operations
- * @author Roman
+ * @author Roman Semenov <romansemenov3@gmail.com>
  */
 public abstract class XMLBean{
     
@@ -58,12 +58,12 @@ public abstract class XMLBean{
     /**
      * HTML file uploader id
      */
-    public final String DATA_FILE = "XMLDataFile";
+    public final String DATA_FILE = "DataImportFile";
     
     /**
      * HTML data merge value
      */
-    public final String DATA_IMPORT_MODE = "XMLDataImportMode";
+    public final String DATA_IMPORT_MODE = "DataImportMode";
     
     protected  final String ROOT_TAG = "human_resource_management_data";
     protected  final String COUNTRY_TAG = "country";

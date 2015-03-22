@@ -78,7 +78,7 @@ public class XMLExport extends XMLBean {
      */
     private Element staffToElement(Staff staff, Document document)
     {
-        Element result = document.createElement(OFFICE_TAG);
+        Element result = document.createElement(STAFF_TAG);
         result.setAttribute("firstName", staff.getFirstName());
         result.setAttribute("secondName", staff.getSecondName());
         result.setAttribute("id", staff.getId().toString());

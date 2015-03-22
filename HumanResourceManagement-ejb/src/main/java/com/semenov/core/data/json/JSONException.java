@@ -3,27 +3,27 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.semenov.core.data.xml;
+package com.semenov.core.data.json;
 
 /**
- * The class <code>XMLException</code> represents common XML error
+ * The class <code>JSONException</code> represents common JSON error
  * @author Roman Semenov <romansemenov3@gmail.com>
  */
-public class XMLException extends Exception{
+public class JSONException extends Exception{
     /**
-     * Creates XMLException
+     * Creates JSONException
      * @param message - error message
      */
-    public XMLException(String message)
+    public JSONException(String message)
     {
         super(message);
     }    
     
     /**
-     * Creates XMLException
+     * Creates JSONException
      * @param e - exception
      */
-    public XMLException(Exception e)
+    public JSONException(Exception e)
     {
         super(e);
     }

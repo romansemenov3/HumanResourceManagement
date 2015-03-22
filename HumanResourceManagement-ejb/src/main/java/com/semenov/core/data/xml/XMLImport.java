@@ -79,12 +79,12 @@ public class XMLImport extends XMLBean {
     public void importXML() throws XMLException
     {
         Document doc = loadFile();
-        ImportMode mergeMode = getImportMode();
+        ImportMode importMode = getImportMode();
         
         NodeList importData = doc.getElementsByTagName(ROOT_TAG);
         if(importData != null && importData.getLength() > 0)
         {        
-            mergeCountries(((Element)importData.item(0)).getElementsByTagName(COUNTRY_TAG), mergeMode);
+            importCountries(((Element)importData.item(0)).getElementsByTagName(COUNTRY_TAG), importMode);
         }
         else
         {
@@ -98,7 +98,7 @@ public class XMLImport extends XMLBean {
      * @param importMode - import mode
      * @throws XMLException 
      */
-    private void mergeCountries(NodeList XMLcountries, ImportMode importMode) throws XMLException
+    private void importCountries(NodeList XMLcountries, ImportMode importMode) throws XMLException
     {
         if(XMLcountries != null)
             for(int i = 0; i < XMLcountries.getLength(); ++i)
@@ -118,7 +118,7 @@ public class XMLImport extends XMLBean {
                         throw new XMLException("Could not parse COUNTRY: " + e.getMessage()); 
                     }
                     
-                    boolean exists = countryFacade.find(country.getId()) != null;
+                    boolean exists = (countryFacade.find(country.getId()) != null);
                     
                     switch(importMode)
                     {
@@ -132,7 +132,7 @@ public class XMLImport extends XMLBean {
                     
                     NodeList XMLregions = ((Element) XMLcountry).getElementsByTagName(REGION_TAG);
                     if(XMLregions != null && XMLregions.getLength() > 0)      
-                        mergeRegions(country, XMLregions, importMode);
+                        importRegions(country, XMLregions, importMode);
                 }
             }
     }
@@ -144,7 +144,7 @@ public class XMLImport extends XMLBean {
      * @param importMode - import mode
      * @throws XMLException 
      */
-    private void mergeRegions(Country countryId, NodeList XMLregions, ImportMode importMode) throws XMLException
+    private void importRegions(Country countryId, NodeList XMLregions, ImportMode importMode) throws XMLException
     {
         if(XMLregions != null)
             for(int i = 0; i < XMLregions.getLength(); ++i)
@@ -164,7 +164,7 @@ public class XMLImport extends XMLBean {
                         throw new XMLException("Could not parse REGION: " + e.getMessage()); 
                     }
                     
-                    boolean exists = regionFacade.find(region.getId()) != null;
+                    boolean exists = (regionFacade.find(region.getId()) != null);
                     
                     switch(importMode)
                     {
@@ -178,9 +178,7 @@ public class XMLImport extends XMLBean {
                     
                     NodeList XMLoffices = ((Element) XMLregion).getElementsByTagName(OFFICE_TAG);
                     if(XMLoffices != null && XMLoffices.getLength() > 0)      
-                        mergeOffices(region, XMLoffices, importMode);
-                    else
-                        throw new XMLException("No offices"); 
+                        importOffices(region, XMLoffices, importMode); 
                 }
             }
     }
@@ -192,7 +190,7 @@ public class XMLImport extends XMLBean {
      * @param importMode - import mode
      * @throws XMLException 
      */
-    private void mergeOffices(Region regionId, NodeList XMLoffices, ImportMode importMode) throws XMLException
+    private void importOffices(Region regionId, NodeList XMLoffices, ImportMode importMode) throws XMLException
     {
         if(XMLoffices != null)
             for(int i = 0; i < XMLoffices.getLength(); ++i)
@@ -212,7 +210,7 @@ public class XMLImport extends XMLBean {
                         throw new XMLException("Could not parse OFFICE: " + e.getMessage()); 
                     }
                     
-                    boolean exists = officeFacade.find(office.getId()) != null;
+                    boolean exists = (officeFacade.find(office.getId()) != null);
                     
                     switch(importMode)
                     {
@@ -226,7 +224,7 @@ public class XMLImport extends XMLBean {
                     
                     NodeList XMLstaff = ((Element) XMLoffice).getElementsByTagName(STAFF_TAG);
                     if(XMLstaff != null && XMLstaff.getLength() > 0)      
-                        mergeStaff(office, XMLstaff, importMode);
+                        importStaff(office, XMLstaff, importMode);
                 }
             }
     }
@@ -238,7 +236,7 @@ public class XMLImport extends XMLBean {
      * @param importMode - import mode
      * @throws XMLException 
      */
-    private void mergeStaff(Office officeId, NodeList XMLstaff, ImportMode importMode) throws XMLException
+    private void importStaff(Office officeId, NodeList XMLstaff, ImportMode importMode) throws XMLException
     {
         if(XMLstaff != null)
             for(int i = 0; i < XMLstaff.getLength(); ++i)
@@ -259,7 +257,7 @@ public class XMLImport extends XMLBean {
                         throw new XMLException("Could not parse STAFF: " + e.getMessage()); 
                     }
                     
-                    boolean exists = staffFacade.find(employee.getId()) != null;
+                    boolean exists = (staffFacade.find(employee.getId()) != null);
                     
                     switch(importMode)
                     {
