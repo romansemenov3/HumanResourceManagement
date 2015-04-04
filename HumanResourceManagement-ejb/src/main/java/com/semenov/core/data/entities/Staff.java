@@ -33,7 +33,7 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "Staff.findByFirstName", query = "SELECT s FROM Staff s WHERE s.firstName = :firstName"),
     @NamedQuery(name = "Staff.findBySecondName", query = "SELECT s FROM Staff s WHERE s.secondName = :secondName"),
     @NamedQuery(name = "Staff.findByOfficeId", query = "SELECT s FROM Staff s WHERE s.officeId = :officeId")})
-public class Staff implements Serializable {
+public class Staff implements Serializable, com.semenov.core.data.entities.Entity {
     private static final long serialVersionUID = 1L;
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
     @Id

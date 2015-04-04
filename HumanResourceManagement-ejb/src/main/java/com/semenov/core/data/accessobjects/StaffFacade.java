@@ -5,12 +5,12 @@
  */
 package com.semenov.core.data.accessobjects;
 
-import com.semenov.core.data.entities.Country;
 import com.semenov.core.data.entities.Office;
-import com.semenov.core.data.entities.Region;
 import com.semenov.core.data.entities.Staff;
+
 import java.math.BigDecimal;
 import java.util.List;
+
 import javax.ejb.LocalBean;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -23,7 +23,7 @@ import javax.persistence.PersistenceContext;
  */
 @Stateless (name="staffOnline")
 @LocalBean
-public class StaffFacade {
+public class StaffFacade implements CRUD<Staff> {
     
     @PersistenceContext
     private EntityManager entityManager;

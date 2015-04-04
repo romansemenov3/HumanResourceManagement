@@ -35,7 +35,7 @@ import com.google.gson.annotations.Expose;
     @NamedQuery(name = "Country.findAll", query = "SELECT c FROM Country c"),
     @NamedQuery(name = "Country.findById", query = "SELECT c FROM Country c WHERE c.id = :id"),
     @NamedQuery(name = "Country.findByName", query = "SELECT c FROM Country c WHERE c.name = :name")})
-public class Country implements Serializable {
+public class Country implements Serializable, com.semenov.core.data.entities.Entity {
     private static final long serialVersionUID = 1L;
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
     @Id

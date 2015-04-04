@@ -20,7 +20,7 @@ import javax.persistence.PersistenceContext;
  */
 @Stateless (name="countryOnline")
 @LocalBean
-public class CountryFacade {
+public class CountryFacade implements CRUD<Country> {
     
     @PersistenceContext
     private EntityManager entityManager;
@@ -48,7 +48,7 @@ public class CountryFacade {
      * @param country - country to add
      */
     public void add(Country country) {
-        entityManager.persist(country);
+    	entityManager.persist(country);
     }
     
     /**

@@ -21,7 +21,7 @@ import javax.persistence.PersistenceContext;
  */
 @Stateless (name="regionOnline")
 @LocalBean
-public class RegionFacade {
+public class RegionFacade implements CRUD<Region> {
     
     @PersistenceContext
     private EntityManager entityManager;

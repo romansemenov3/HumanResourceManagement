@@ -5,7 +5,6 @@
  */
 package com.semenov.core.data.accessobjects;
 
-import com.semenov.core.data.entities.Country;
 import com.semenov.core.data.entities.Office;
 import com.semenov.core.data.entities.Region;
 import java.math.BigDecimal;
@@ -22,7 +21,7 @@ import javax.persistence.PersistenceContext;
  */
 @Stateless (name="officeOnline")
 @LocalBean
-public class OfficeFacade {
+public class OfficeFacade implements CRUD<Office> {
     
     @PersistenceContext
     private EntityManager entityManager;

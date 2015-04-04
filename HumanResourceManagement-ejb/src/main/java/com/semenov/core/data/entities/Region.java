@@ -37,7 +37,7 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "Region.findById", query = "SELECT r FROM Region r WHERE r.id = :id"),
     @NamedQuery(name = "Region.findByName", query = "SELECT r FROM Region r WHERE r.name = :name"),
     @NamedQuery(name = "Region.findByCountryId", query = "SELECT r FROM Region r WHERE r.countryId = :countryId")})
-public class Region implements Serializable {
+public class Region implements Serializable, com.semenov.core.data.entities.Entity {
     private static final long serialVersionUID = 1L;
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
     @Id

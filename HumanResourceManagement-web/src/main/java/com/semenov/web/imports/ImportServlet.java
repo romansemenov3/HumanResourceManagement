@@ -5,11 +5,12 @@
  */
 package com.semenov.web.imports;
 
-import com.semenov.core.data.json.JSONException;
-import com.semenov.core.data.json.JSONImport;
-import com.semenov.core.data.xml.XMLException;
-import com.semenov.core.data.xml.XMLImport;
+import com.semenov.core.data.entities.Country;
+import com.semenov.core.data.xml.DataImporter;
+
 import java.io.IOException;
+import java.math.BigDecimal;
+
 import javax.ejb.EJB;
 import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
@@ -17,7 +18,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
+import javax.servlet.http.Part;
 /**
  *
  * @author Roman
@@ -25,12 +26,9 @@ import javax.servlet.http.HttpServletResponse;
 @WebServlet(name = "ImportServlet", urlPatterns = {"/import"})
 @MultipartConfig(location="/tmp", fileSizeThreshold=1024*1024, maxFileSize=1024*1024*5, maxRequestSize=1024*1024*5*5)
 public class ImportServlet extends HttpServlet {
-
-    @EJB (beanName="XMLImport")
-    XMLImport xmlImport;
     
-    @EJB (beanName="JSONImport")
-    JSONImport jsonImport;
+    @EJB (beanName="DataImporter")
+    private DataImporter importer;
     
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -44,29 +42,38 @@ public class ImportServlet extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
-        switch(request.getParameter("DataImportType"))
+    	DataImporter.ImportMode importMode = null;
+    	DataImporter.ImportType importType = null;
+    	
+    	switch(request.getParameter("DataImportType"))
         {
-            case "XML": 
-                try
-                {
-                    xmlImport.importXML();
-                }catch(XMLException e)
-                {
-                    request.setAttribute("importResult", "Import error: " + e.getMessage());
-                }
-            break;
-            case "JSON":
-                try
-                {
-                    jsonImport.importJSON();
-                }catch(JSONException e)
-                {
-                    request.setAttribute("importResult", "Import error: " + e.getMessage());
-                }
-            break;
+            case "XML": importType = DataImporter.ImportType.XML; break;
+            case "JSON": importType = DataImporter.ImportType.JSON; break;
             default:
                 request.setAttribute("importResult", "Import error: unknown data type.");
         }
+    	
+    	switch(request.getParameter("DataImportMode"))
+        {
+            case "ADD_ONLY": importMode = DataImporter.ImportMode.ADD_ONLY; break;
+            case "REWRITE": importMode = DataImporter.ImportMode.REWRITE; break;
+            default:
+                request.setAttribute("importResult", "Import error: unknown import mode.");
+        }
+    	
+    	Part part = request.getPart("DataImportFile");
+    	if(part != null)
+    	{
+            try {
+                importer.importData(importType, importMode, part.getInputStream());
+            } catch (Exception e) {
+                request.setAttribute("importResult", "Import error: file error: " + e.getMessage());
+            }
+    	}
+    	else
+    	{
+            request.setAttribute("importResult", "Import error: could not load file.");
+    	}
         
         request.setAttribute("content", "import/import.jsp");
         

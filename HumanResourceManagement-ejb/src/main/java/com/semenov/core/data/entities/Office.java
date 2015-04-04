@@ -37,7 +37,7 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "Office.findById", query = "SELECT o FROM Office o WHERE o.id = :id"),
     @NamedQuery(name = "Office.findByName", query = "SELECT o FROM Office o WHERE o.name = :name"),
     @NamedQuery(name = "Office.findByRegionId", query = "SELECT o FROM Office o WHERE o.regionId = :regionId")})
-public class Office implements Serializable {
+public class Office implements Serializable, com.semenov.core.data.entities.Entity {
     private static final long serialVersionUID = 1L;
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
     @Id
