@@ -11,4 +11,7 @@
     <module>HumanResourceManagement-web</module>
     <module>HumanResourceManagement-ejb</module>
   </modules>
+  <dependencies>
+  	
+  </dependencies>
 </project>

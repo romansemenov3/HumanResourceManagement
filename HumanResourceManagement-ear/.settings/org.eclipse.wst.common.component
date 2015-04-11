@@ -11,5 +11,8 @@
         <dependent-module archiveName="HumanResourceManagement-web-1.0-SNAPSHOT.war" deploy-path="/" handle="module:/resource/HumanResourceManagement-web/HumanResourceManagement-web">
             <dependency-type>uses</dependency-type>
         </dependent-module>
+        <dependent-module archiveName="HumanResourceManagement-gwt-1.0-SNAPSHOT.war" deploy-path="/" handle="module:/classpath/var/M2_REPO/com/semenov/HumanResourceManagement-gwt/1.0-SNAPSHOT/HumanResourceManagement-gwt-1.0-SNAPSHOT.war">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
     </wb-module>
 </project-modules>
