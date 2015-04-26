@@ -23,7 +23,7 @@ import javax.servlet.http.HttpServletResponse;
  *
  * @author Roman Semenov <romansemenov3@gmail.com>
  */
-@WebServlet(name = "AddRegionServlet", urlPatterns = {"/add_region"})
+@WebServlet(name = "AddRegionServlet", urlPatterns = {"/region/add"})
 public class AddRegionServlet extends HttpServlet {
     
     @EJB(beanName="countryOnline")
@@ -50,18 +50,7 @@ public class AddRegionServlet extends HttpServlet {
             
             Region regionToAdd = new Region(null, "New Region", country);
             regionFacade.add(regionToAdd);
-            
-            request.setAttribute("country", country);
-            request.setAttribute("regions", regionFacade.list(country));
-            request.setAttribute("content", "region/regions.jsp");
-        }
-        else {        
-            
-            request.setAttribute("countries", countryFacade.list());
-            request.setAttribute("content", "country/countries.jsp");
-        }
-        
-        request.getRequestDispatcher("index.jsp").forward(request, response);        
+        }    
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

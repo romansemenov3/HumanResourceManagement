@@ -8,8 +8,14 @@ package com.semenov.web.country;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.semenov.core.data.accessobjects.CountryFacade;
+import com.semenov.core.data.entities.Country;
+import com.semenov.core.utils.StringUtils;
+
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+
 import javax.ejb.EJB;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -21,7 +27,7 @@ import javax.servlet.http.HttpServletResponse;
  *
  * @author Roman Semenov <romansemenov3@gmail.com>
  */
-@WebServlet(name = "CountryJsonServlet", urlPatterns = {"/country_json"})
+@WebServlet(name = "CountryJsonServlet", urlPatterns = {"/country/json"})
 public class CountryJsonServlet extends HttpServlet {
 
     @EJB(beanName="countryOnline")
@@ -38,9 +44,36 @@ public class CountryJsonServlet extends HttpServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+    	
+    	//?length=x
+    	//?length=x&page=y
+    	//?id=x
         
-        Gson gson = new GsonBuilder().serializeNulls().excludeFieldsWithoutExposeAnnotation().create();
-        String countriesData = gson.toJson(countryFacade.list());
+    	Gson gson = new GsonBuilder().serializeNulls().excludeFieldsWithoutExposeAnnotation().create();
+    	String countriesData = "";
+    	
+    	String pageLength = request.getParameter("length");    	
+        if (StringUtils.isNotEmpty(pageLength)) { 
+        	int length = Integer.parseInt(pageLength);
+        	String pageNumber = request.getParameter("page");
+            if (StringUtils.isNotEmpty(pageNumber)) {
+            	countriesData = gson.toJson(countryFacade.page(length, Integer.parseInt(pageNumber)));
+            }
+            else
+            {
+            	countriesData = "{\"pages\":\""
+            					+ String.valueOf(countryFacade.getRowCount() / length + 
+            									((countryFacade.getRowCount() % length == 0) ? 0 : 1)) +
+            					"\"}";
+            }
+        }
+        else
+        {
+        	String countryID = request.getParameter("id");
+        	if (StringUtils.isNotEmpty(countryID)) { 
+        		countriesData = gson.toJson(countryFacade.find(new BigDecimal(countryID)));
+        	}
+        }
 
         response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();

@@ -5,14 +5,18 @@
  */
 package com.semenov.core.data.accessobjects;
 
+import com.semenov.core.data.entities.Country;
 import com.semenov.core.data.entities.Office;
 import com.semenov.core.data.entities.Region;
+
 import java.math.BigDecimal;
 import java.util.List;
+
 import javax.ejb.LocalBean;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
 
 
 /**
@@ -46,6 +50,19 @@ public class OfficeFacade implements CRUD<Office> {
                 setParameter("regionId", region).getResultList();
     }
     
+	/**
+	 * Gets page view of offices
+	 * @param pageLength - page length
+	 * @param pageNumber - page number
+	 * @return offices page
+	 */
+	public List<Office> page(Region region, int pageLength, int pageNumber) {
+		TypedQuery<Office> query = entityManager.createNamedQuery("Office.findByRegionId", Office.class).setParameter("regionId", region);
+		query.setFirstResult(pageLength*pageNumber);
+		query.setMaxResults(pageLength);		
+		return query.getResultList();
+	}
+    
     /**
      * Gets country by ID number
      * @param id - country ID number
@@ -78,4 +95,14 @@ public class OfficeFacade implements CRUD<Office> {
     public void delete(Office office) {
         entityManager.remove(entityManager.contains(office) ? office : entityManager.merge(office));
     }
+    
+    /**
+     * Gets total row amount
+     * @param region - regions with offices
+     * @return total row amount
+     */
+	public long getRowCount(Region region) {
+		return entityManager.createQuery("SELECT COUNT(o) FROM Office o WHERE o.regionId = :regionId", Long.class).
+				setParameter("regionId", region).getSingleResult();
+	}
 }

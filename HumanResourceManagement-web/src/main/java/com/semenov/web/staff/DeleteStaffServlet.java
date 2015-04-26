@@ -24,14 +24,8 @@ import javax.servlet.http.HttpServletResponse;
  *
  * @author Roman Semenov <romansemenov3@gmail.com>
  */
-@WebServlet(name = "DeleteStaffServlet", urlPatterns = {"/delete_staff"})
+@WebServlet(name = "DeleteStaffServlet", urlPatterns = {"/staff/delete"})
 public class DeleteStaffServlet extends HttpServlet {
-    
-    @EJB(beanName="countryOnline")
-    CountryFacade countryFacade;
-    
-    @EJB(beanName="officeOnline")
-    OfficeFacade officeFacade;
     
     @EJB(beanName="staffOnline")
     StaffFacade staffFacade;
@@ -49,7 +43,6 @@ public class DeleteStaffServlet extends HttpServlet {
             throws ServletException, IOException {
         
         String staffId = request.getParameter("id");
-        String officeId = request.getParameter("office_id");
         if (StringUtils.isNotEmpty(staffId)) {
             
             Staff staffToDelete = staffFacade.find(new BigDecimal(staffId));
@@ -59,29 +52,7 @@ public class DeleteStaffServlet extends HttpServlet {
             {
                 staffFacade.delete(staffToDelete);
             }
-            
-            request.setAttribute("employees", staffFacade.list(office));
-            request.setAttribute("office", office);
-            request.setAttribute("content", "staff/employees.jsp");
-        }
-        else
-        {
-            if(StringUtils.isNotEmpty(officeId))
-            {
-                Office office = officeFacade.find(new BigDecimal(officeId));
-                request.setAttribute("employees", staffFacade.list(office));
-                request.setAttribute("office", office);
-                request.setAttribute("content", "staff/employees.jsp");
-            }
-            else
-            {
-                request.setAttribute("countries", countryFacade.list());
-                request.setAttribute("content", "country/countries.jsp");
-            }
-        }
-        
-        request.getRequestDispatcher("index.jsp").forward(request, response);
-        
+        }        
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

@@ -1,0 +1,33 @@
+@CHARSET "UTF-8";
+
+.headerTable {
+	padding: 5px;
+}
+
+.popupDiv {
+	background: #fff;
+	padding: 5px;
+	border: solid 1px black;
+	position: relative;
+}
+
+.popupTable {
+	border: solid 1px black;
+}
+
+.popupTableHeader {
+	 text-align: center;
+	 font-weight: bold;
+}
+
+.popupColumnName {
+	text-align: left;
+}
+
+.popupColumnValue {
+	text-align: left;
+}
+
+.popupColumnButton {
+	text-align: center;
+}

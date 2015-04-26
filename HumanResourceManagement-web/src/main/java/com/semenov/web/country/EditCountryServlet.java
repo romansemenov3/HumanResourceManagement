@@ -21,10 +21,10 @@ import javax.servlet.http.HttpServletResponse;
  *
  * @author Roman Semenov <romansemenov3@gmail.com>
  */
-@WebServlet(name = "EditCountryServlet", urlPatterns = {"/edit_country"})
+@WebServlet(name = "EditCountryServlet", urlPatterns = {"/country/edit"})
 public class EditCountryServlet extends HttpServlet {
     
-    @EJB(beanName="countryOnline")
+	@EJB(beanName="countryOnline")
     CountryFacade countryFacade;
 
     /**
@@ -49,18 +49,7 @@ public class EditCountryServlet extends HttpServlet {
                 countryToEdit.setName(countryName);
                 countryFacade.update(countryToEdit);
             }
-            
-            request.setAttribute("country", countryToEdit);
-            request.setAttribute("content", "country/country.jsp");
-        }
-        else {        
-            
-            request.setAttribute("countries", countryFacade.list());
-            request.setAttribute("content", "country/countries.jsp");
-        }
-        
-        request.getRequestDispatcher("index.jsp").forward(request, response);
-        
+        }       
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

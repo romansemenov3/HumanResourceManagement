@@ -6,12 +6,15 @@
 package com.semenov.core.data.accessobjects;
 
 import com.semenov.core.data.entities.Country;
+
 import java.math.BigDecimal;
 import java.util.List;
+
 import javax.ejb.LocalBean;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
 
 
 /**
@@ -33,6 +36,19 @@ public class CountryFacade implements CRUD<Country> {
     {
         return entityManager.createNamedQuery("Country.findAll", Country.class).getResultList();
     }
+    
+	/**
+	 * Gets page view of countries
+	 * @param pageLength - page length
+	 * @param pageNumber - page number
+	 * @return countries page
+	 */
+	public List<Country> page(int pageLength, int pageNumber) {
+		TypedQuery<Country> query = entityManager.createNamedQuery("Country.findAll", Country.class);
+		query.setFirstResult(pageLength*pageNumber);
+		query.setMaxResults(pageLength);		
+		return query.getResultList();
+	}
     
     /**
      * Gets country by ID number
@@ -66,4 +82,12 @@ public class CountryFacade implements CRUD<Country> {
     public void delete(Country country) {
         entityManager.remove(entityManager.contains(country) ? country : entityManager.merge(country));
     }
+
+    /**
+     * Gets total row amount
+     * @return total row amount
+     */
+	public long getRowCount() {
+		return entityManager.createQuery("SELECT COUNT(c) FROM Country c", Long.class).getSingleResult();
+	}
 }

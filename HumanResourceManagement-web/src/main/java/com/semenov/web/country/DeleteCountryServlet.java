@@ -21,7 +21,7 @@ import javax.servlet.http.HttpServletResponse;
  *
  * @author Roman Semenov <romansemenov3@gmail.com>
  */
-@WebServlet(name = "DeleteCountryServlet", urlPatterns = {"/delete_country"})
+@WebServlet(name = "DeleteCountryServlet", urlPatterns = {"/country/delete"})
 public class DeleteCountryServlet extends HttpServlet {
     
     @EJB(beanName="countryOnline")
@@ -48,12 +48,7 @@ public class DeleteCountryServlet extends HttpServlet {
             {
                 countryFacade.delete(countryToDelete);
             }
-        }
-        
-        request.setAttribute("countries", countryFacade.list());
-        request.setAttribute("content", "country/countries.jsp");
-        request.getRequestDispatcher("index.jsp").forward(request, response);
-        
+        }        
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

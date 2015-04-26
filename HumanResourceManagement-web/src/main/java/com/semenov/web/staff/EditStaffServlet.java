@@ -24,11 +24,8 @@ import javax.servlet.http.HttpServletResponse;
  *
  * @author Roman Semenov <romansemenov3@gmail.com>
  */
-@WebServlet(name = "EditStaffServlet", urlPatterns = {"/edit_staff"})
+@WebServlet(name = "EditStaffServlet", urlPatterns = {"/staff/edit"})
 public class EditStaffServlet extends HttpServlet {
-    
-    @EJB(beanName="countryOnline")
-    CountryFacade countryFacade;
 
     @EJB(beanName="officeOnline")
     OfficeFacade officeFacade;
@@ -52,7 +49,6 @@ public class EditStaffServlet extends HttpServlet {
         String staffFirstName = request.getParameter("firstName");
         String staffSecondName = request.getParameter("secondName");
         String officeId = request.getParameter("officeId");
-        String officeId2 = request.getParameter("office_id");
         if (StringUtils.isNotEmpty(staffId)) {
             Staff staffToEdit = staffFacade.find(new BigDecimal(staffId));
             
@@ -67,29 +63,7 @@ public class EditStaffServlet extends HttpServlet {
                 }
                 staffFacade.update(staffToEdit);
             }
-            
-            request.setAttribute("employee", staffToEdit);
-            request.setAttribute("content", "staff/employee.jsp");
-        }
-        else {        
-            
-            if(StringUtils.isNotEmpty(officeId2))
-            {
-                Office office = officeFacade.find(new BigDecimal(officeId2));
-                request.setAttribute("employees", staffFacade.list(office));
-                request.setAttribute("office", office);
-                request.setAttribute("content", "staff/employees.jsp");
-            }
-            else
-            {
-                request.setAttribute("countries", countryFacade.list());
-                request.setAttribute("content", "country/countries.jsp");
-            }
-
-        }
-        
-        request.getRequestDispatcher("index.jsp").forward(request, response);
-        
+        }        
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

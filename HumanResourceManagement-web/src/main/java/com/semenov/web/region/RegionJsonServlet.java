@@ -14,9 +14,11 @@ import com.semenov.core.data.accessobjects.RegionFacade;
 import com.semenov.core.data.entities.Country;
 import com.semenov.core.data.entities.Region;
 import com.semenov.core.utils.StringUtils;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.math.BigDecimal;
+
 import javax.ejb.EJB;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -28,9 +30,8 @@ import javax.servlet.http.HttpServletResponse;
  *
  * @author Roman Semenov <romansemenov3@gmail.com>
  */
-@WebServlet(name = "RegionJsonServlet", urlPatterns = {"/region_json"})
+@WebServlet(name = "RegionJsonServlet", urlPatterns = {"/region/json"})
 public class RegionJsonServlet extends HttpServlet {
-
     
     @EJB(beanName="countryOnline")
     CountryFacade countryFacade;
@@ -50,19 +51,48 @@ public class RegionJsonServlet extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
-        String countryId = request.getParameter("country_id");
-        if (StringUtils.isNotEmpty(countryId)) {   
-            Country country = countryFacade.find(new BigDecimal(countryId));
-            
-            Gson gson = new GsonBuilder().serializeNulls().excludeFieldsWithoutExposeAnnotation().create();
-            String regionsData = gson.toJson(regionFacade.list(country));
-
-            response.setContentType("text/html;charset=UTF-8");
-            PrintWriter out = response.getWriter();
-            out.println( regionsData );
-            out.close();
-        }
+    	//?country_id=i&length=x
+    	//?country_id=i&length=x&page=y
+    	//?id=x
         
+    	Gson gson = new GsonBuilder().serializeNulls().excludeFieldsWithoutExposeAnnotation().create();
+    	String regionsData = "";
+    	
+    	String countryId = request.getParameter("country_id");
+    	String pageLength = request.getParameter("length");
+    	
+        if (StringUtils.isNotEmpty(countryId) && StringUtils.isNotEmpty(pageLength)) {
+
+            Country country = countryFacade.find(new BigDecimal(countryId));
+            if(country != null)
+            {            
+	        	int length = Integer.parseInt(pageLength);            	
+	            	
+	        	String pageNumber = request.getParameter("page");
+	            if (StringUtils.isNotEmpty(pageNumber)) {
+	            	regionsData = gson.toJson(regionFacade.page(country, length, Integer.parseInt(pageNumber)));
+	            }
+	            else
+	            {
+	            	regionsData = "{\"pages\":\""
+	            					+ String.valueOf(regionFacade.getRowCount(country) / length + 
+	            									((regionFacade.getRowCount(country) % length == 0) ? 0 : 1)) +
+	            					"\"}";
+	            }
+            }
+        }
+        else
+        {
+        	String regionID = request.getParameter("id");
+        	if (StringUtils.isNotEmpty(regionID)) { 
+        		regionsData = gson.toJson(regionFacade.find(new BigDecimal(regionID)));
+        	}
+        }
+
+        response.setContentType("text/html;charset=UTF-8");
+        PrintWriter out = response.getWriter();
+        out.println( regionsData );
+        out.close();
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

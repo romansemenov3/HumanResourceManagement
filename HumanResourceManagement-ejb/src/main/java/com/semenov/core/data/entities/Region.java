@@ -33,10 +33,10 @@ import javax.xml.bind.annotation.XmlTransient;
 @Table(name = "REGION")
 @XmlRootElement
 @NamedQueries({
-    @NamedQuery(name = "Region.findAll", query = "SELECT r FROM Region r"),
+    @NamedQuery(name = "Region.findAll", query = "SELECT r FROM Region r ORDER BY r.id ASC"),
     @NamedQuery(name = "Region.findById", query = "SELECT r FROM Region r WHERE r.id = :id"),
-    @NamedQuery(name = "Region.findByName", query = "SELECT r FROM Region r WHERE r.name = :name"),
-    @NamedQuery(name = "Region.findByCountryId", query = "SELECT r FROM Region r WHERE r.countryId = :countryId")})
+    @NamedQuery(name = "Region.findByName", query = "SELECT r FROM Region r WHERE r.name = :name ORDER BY r.id ASC"),
+    @NamedQuery(name = "Region.findByCountryId", query = "SELECT r FROM Region r WHERE r.countryId = :countryId ORDER BY r.id ASC")})
 public class Region implements Serializable, com.semenov.core.data.entities.Entity {
     private static final long serialVersionUID = 1L;
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation

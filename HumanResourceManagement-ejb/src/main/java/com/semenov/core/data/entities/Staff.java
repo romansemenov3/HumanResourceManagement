@@ -7,6 +7,7 @@ package com.semenov.core.data.entities;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -20,6 +21,8 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import com.google.gson.annotations.Expose;
+
 /**
  *
  * @author Roman
@@ -28,27 +31,30 @@ import javax.xml.bind.annotation.XmlRootElement;
 @Table(name = "STAFF")
 @XmlRootElement
 @NamedQueries({
-    @NamedQuery(name = "Staff.findAll", query = "SELECT s FROM Staff s"),
+    @NamedQuery(name = "Staff.findAll", query = "SELECT s FROM Staff s ORDER BY s.id ASC"),
     @NamedQuery(name = "Staff.findById", query = "SELECT s FROM Staff s WHERE s.id = :id"),
-    @NamedQuery(name = "Staff.findByFirstName", query = "SELECT s FROM Staff s WHERE s.firstName = :firstName"),
-    @NamedQuery(name = "Staff.findBySecondName", query = "SELECT s FROM Staff s WHERE s.secondName = :secondName"),
-    @NamedQuery(name = "Staff.findByOfficeId", query = "SELECT s FROM Staff s WHERE s.officeId = :officeId")})
+    @NamedQuery(name = "Staff.findByFirstName", query = "SELECT s FROM Staff s WHERE s.firstName = :firstName ORDER BY s.id ASC"),
+    @NamedQuery(name = "Staff.findBySecondName", query = "SELECT s FROM Staff s WHERE s.secondName = :secondName ORDER BY s.id ASC"),
+    @NamedQuery(name = "Staff.findByOfficeId", query = "SELECT s FROM Staff s WHERE s.officeId = :officeId ORDER BY s.id ASC")})
 public class Staff implements Serializable, com.semenov.core.data.entities.Entity {
     private static final long serialVersionUID = 1L;
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
     @Id
     @Basic(optional = false)
     @Column(name = "ID")
+    @Expose
     private BigDecimal id;
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 30)
     @Column(name = "FIRST_NAME")
+    @Expose
     private String firstName;
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 30)
     @Column(name = "SECOND_NAME")
+    @Expose
     private String secondName;
     @JoinColumn(name = "OFFICE_ID", referencedColumnName = "ID")
     @ManyToOne(optional = false)

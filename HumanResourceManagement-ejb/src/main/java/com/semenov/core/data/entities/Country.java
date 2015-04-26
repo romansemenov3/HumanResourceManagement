@@ -32,9 +32,10 @@ import com.google.gson.annotations.Expose;
 @Table(name = "COUNTRY")
 @XmlRootElement
 @NamedQueries({
-    @NamedQuery(name = "Country.findAll", query = "SELECT c FROM Country c"),
+    @NamedQuery(name = "Country.findAll", query = "SELECT c FROM Country c ORDER BY c.id ASC"),
     @NamedQuery(name = "Country.findById", query = "SELECT c FROM Country c WHERE c.id = :id"),
-    @NamedQuery(name = "Country.findByName", query = "SELECT c FROM Country c WHERE c.name = :name")})
+    @NamedQuery(name = "Country.findByName", query = "SELECT c FROM Country c WHERE c.name = :name ORDER BY c.id ASC")})
+
 public class Country implements Serializable, com.semenov.core.data.entities.Entity {
     private static final long serialVersionUID = 1L;
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
@@ -112,6 +113,5 @@ public class Country implements Serializable, com.semenov.core.data.entities.Ent
     @Override
     public String toString() {
         return "com.semenov.core.data.entities.Country[ id=" + id + " ]";
-    }
-    
+    }    
 }

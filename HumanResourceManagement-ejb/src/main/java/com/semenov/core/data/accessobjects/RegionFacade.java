@@ -7,12 +7,15 @@ package com.semenov.core.data.accessobjects;
 
 import com.semenov.core.data.entities.Country;
 import com.semenov.core.data.entities.Region;
+
 import java.math.BigDecimal;
 import java.util.List;
+
 import javax.ejb.LocalBean;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
 
 
 /**
@@ -46,6 +49,19 @@ public class RegionFacade implements CRUD<Region> {
                 setParameter("countryId", country).getResultList();
     }
     
+	/**
+	 * Gets page view of regions
+	 * @param pageLength - page length
+	 * @param pageNumber - page number
+	 * @return regions page
+	 */
+	public List<Region> page(Country country, int pageLength, int pageNumber) {
+		TypedQuery<Region> query = entityManager.createNamedQuery("Region.findByCountryId", Region.class).setParameter("countryId", country);
+		query.setFirstResult(pageLength*pageNumber);
+		query.setMaxResults(pageLength);		
+		return query.getResultList();
+	}
+    
     /**
      * Gets region by ID number
      * @param id - region ID number
@@ -78,4 +94,14 @@ public class RegionFacade implements CRUD<Region> {
     public void delete(Region region) {
         entityManager.remove(entityManager.contains(region) ? region : entityManager.merge(region));
     }
+    
+    /**
+     * Gets total row amount
+     * @param country - country with regions
+     * @return total row amount
+     */
+	public long getRowCount(Country country) {
+		return entityManager.createQuery("SELECT COUNT(r) FROM Region r WHERE r.countryId = :countryId", Long.class).
+				setParameter("countryId", country).getSingleResult();
+	}
 }

@@ -24,11 +24,8 @@ import javax.servlet.http.HttpServletResponse;
  *
  * @author Roman Semenov <romansemenov3@gmail.com>
  */
-@WebServlet(name = "AddStaffServlet", urlPatterns = {"/add_staff"})
+@WebServlet(name = "AddStaffServlet", urlPatterns = {"/staff/add"})
 public class AddStaffServlet extends HttpServlet {
-    
-    @EJB(beanName="countryOnline")
-    CountryFacade countryFacade;
     
     @EJB(beanName="officeOnline")
     OfficeFacade officeFacade;
@@ -54,18 +51,7 @@ public class AddStaffServlet extends HttpServlet {
             
             Staff staffToAdd = new Staff(null, "New", "Employee", office);
             staffFacade.add(staffToAdd);
-            
-            request.setAttribute("office", office);
-            request.setAttribute("employees", staffFacade.list(office));
-            request.setAttribute("content", "staff/employees.jsp");
-        }
-        else {        
-            
-            request.setAttribute("countries", countryFacade.list());
-            request.setAttribute("content", "country/countries.jsp");
-        }
-        
-        request.getRequestDispatcher("index.jsp").forward(request, response);        
+        }       
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

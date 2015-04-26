@@ -19,7 +19,7 @@ import javax.servlet.http.HttpServletResponse;
  *
  * @author Roman Semenov <romansemenov3@gmail.com>
  */
-@WebServlet(name = "AddCountryServlet", urlPatterns = {"/add_country"})
+@WebServlet(name = "AddCountryServlet", urlPatterns = {"/country/add"})
 public class AddCountryServlet extends HttpServlet {
     
     @EJB(beanName="countryOnline")
@@ -38,12 +38,7 @@ public class AddCountryServlet extends HttpServlet {
             throws ServletException, IOException {          
             
         Country countryToAdd = new Country(null, "New Country");
-        countryFacade.add(countryToAdd);
-        
-        request.setAttribute("countries", countryFacade.list());
-        request.setAttribute("content", "country/countries.jsp");
-        request.getRequestDispatcher("index.jsp").forward(request, response);
-        
+        countryFacade.add(countryToAdd);        
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

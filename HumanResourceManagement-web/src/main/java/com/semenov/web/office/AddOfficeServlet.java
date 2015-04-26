@@ -25,11 +25,8 @@ import javax.servlet.http.HttpServletResponse;
  *
  * @author Roman Semenov <romansemenov3@gmail.com>
  */
-@WebServlet(name = "AddOfficeServlet", urlPatterns = {"/add_office"})
+@WebServlet(name = "AddOfficeServlet", urlPatterns = {"/office/add"})
 public class AddOfficeServlet extends HttpServlet {
-    
-    @EJB(beanName="countryOnline")
-    CountryFacade countryFacade;
     
     @EJB(beanName="regionOnline")
     RegionFacade regionFacade;
@@ -55,18 +52,7 @@ public class AddOfficeServlet extends HttpServlet {
             
             Office officeToAdd = new Office(null, "New Office", region);
             officeFacade.add(officeToAdd);
-            
-            request.setAttribute("region", region);
-            request.setAttribute("offices", officeFacade.list(region));
-            request.setAttribute("content", "office/offices.jsp");
         }
-        else {        
-            
-            request.setAttribute("countries", countryFacade.list());
-            request.setAttribute("content", "country/countries.jsp");
-        }
-        
-        request.getRequestDispatcher("index.jsp").forward(request, response);        
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

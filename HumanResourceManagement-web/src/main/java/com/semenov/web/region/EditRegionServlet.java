@@ -23,11 +23,8 @@ import javax.servlet.http.HttpServletResponse;
  *
  * @author Roman Semenov <romansemenov3@gmail.com>
  */
-@WebServlet(name = "EditRegionServlet", urlPatterns = {"/edit_region"})
+@WebServlet(name = "EditRegionServlet", urlPatterns = {"/region/edit"})
 public class EditRegionServlet extends HttpServlet {
-    
-    @EJB(beanName="countryOnline")
-    CountryFacade countryFacade;
     
     @EJB(beanName="regionOnline")
     RegionFacade regionFacade;
@@ -46,7 +43,6 @@ public class EditRegionServlet extends HttpServlet {
         
         String regionId = request.getParameter("id");
         String regionName = request.getParameter("name");
-        String countryId = request.getParameter("country_id");
         if (StringUtils.isNotEmpty(regionId)) {
             Region regionToEdit = regionFacade.find(new BigDecimal(regionId));
             
@@ -55,29 +51,7 @@ public class EditRegionServlet extends HttpServlet {
                 regionToEdit.setName(regionName);
                 regionFacade.update(regionToEdit);
             }
-            
-            request.setAttribute("region", regionToEdit);
-            request.setAttribute("content", "region/region.jsp");
-        }
-        else {        
-            
-            if(StringUtils.isNotEmpty(countryId))
-            {
-                Country country = countryFacade.find(new BigDecimal(countryId));
-                request.setAttribute("regions", regionFacade.list(country));
-                request.setAttribute("country", country);
-                request.setAttribute("content", "region/regions.jsp");
-            }
-            else
-            {
-                request.setAttribute("countries", countryFacade.list());
-                request.setAttribute("content", "country/countries.jsp");
-            }
-
-        }
-        
-        request.getRequestDispatcher("index.jsp").forward(request, response);
-        
+        }        
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

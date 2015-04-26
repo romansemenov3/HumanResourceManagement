@@ -9,11 +9,14 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.semenov.core.data.accessobjects.OfficeFacade;
 import com.semenov.core.data.accessobjects.RegionFacade;
+import com.semenov.core.data.entities.Country;
 import com.semenov.core.data.entities.Region;
 import com.semenov.core.utils.StringUtils;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.math.BigDecimal;
+
 import javax.ejb.EJB;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -25,7 +28,7 @@ import javax.servlet.http.HttpServletResponse;
  *
  * @author Roman Semenov <romansemenov3@gmail.com>
  */
-@WebServlet(name = "OfficeJsonServlet", urlPatterns = {"/office_json"})
+@WebServlet(name = "OfficeJsonServlet", urlPatterns = {"/office/json"})
 public class OfficeJsonServlet extends HttpServlet {
 
     
@@ -47,18 +50,47 @@ public class OfficeJsonServlet extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
-        String regionId = request.getParameter("region_id");
-        if (StringUtils.isNotEmpty(regionId)) {   
+    	//?region_id=i&length=x
+    	//?region_id=i&length=x&page=y
+    	//?id=x
+        
+    	Gson gson = new GsonBuilder().serializeNulls().excludeFieldsWithoutExposeAnnotation().create();
+    	String officesData = "";
+    	
+    	String regionId = request.getParameter("region_id");
+    	String pageLength = request.getParameter("length");
+    	
+        if (StringUtils.isNotEmpty(regionId) && StringUtils.isNotEmpty(pageLength)) {
             Region region = regionFacade.find(new BigDecimal(regionId));
-            
-            Gson gson = new GsonBuilder().serializeNulls().excludeFieldsWithoutExposeAnnotation().create();
-            String officesData = gson.toJson(officeFacade.list(region));
-
-            response.setContentType("text/html;charset=UTF-8");
-            PrintWriter out = response.getWriter();
-            out.println( officesData );
-            out.close();
+            if(region != null)
+            {            
+	        	int length = Integer.parseInt(pageLength);            	
+	            	
+	        	String pageNumber = request.getParameter("page");
+	            if (StringUtils.isNotEmpty(pageNumber)) {
+	            	officesData = gson.toJson(officeFacade.page(region, length, Integer.parseInt(pageNumber)));
+	            }
+	            else
+	            {
+	            	officesData = "{\"pages\":\""
+	            					+ String.valueOf(officeFacade.getRowCount(region) / length + 
+	            									((officeFacade.getRowCount(region) % length == 0) ? 0 : 1)) +
+	            					"\"}";
+	            }
+            }
         }
+        else
+        {
+        	String officeID = request.getParameter("id");
+        	if (StringUtils.isNotEmpty(officeID)) { 
+        		officesData = gson.toJson(officeFacade.find(new BigDecimal(officeID)));
+        	}
+        }
+
+        response.setContentType("text/html;charset=UTF-8");
+        PrintWriter out = response.getWriter();
+        out.println( officesData );
+        out.close();
         
     }
 

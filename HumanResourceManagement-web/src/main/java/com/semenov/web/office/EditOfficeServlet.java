@@ -25,14 +25,8 @@ import javax.servlet.http.HttpServletResponse;
  *
  * @author Roman Semenov <romansemenov3@gmail.com>
  */
-@WebServlet(name = "EditOfficeServlet", urlPatterns = {"/edit_office"})
+@WebServlet(name = "EditOfficeServlet", urlPatterns = {"/office/edit"})
 public class EditOfficeServlet extends HttpServlet {
-    
-    @EJB(beanName="countryOnline")
-    CountryFacade countryFacade;
-    
-    @EJB(beanName="regionOnline")
-    RegionFacade regionFacade;
 
     @EJB(beanName="officeOnline")
     OfficeFacade officeFacade;
@@ -51,7 +45,6 @@ public class EditOfficeServlet extends HttpServlet {
         
         String officeId = request.getParameter("id");
         String officeName = request.getParameter("name");
-        String regionId = request.getParameter("region_id");
         if (StringUtils.isNotEmpty(officeId)) {
             Office officeToEdit = officeFacade.find(new BigDecimal(officeId));
             
@@ -60,29 +53,7 @@ public class EditOfficeServlet extends HttpServlet {
                 officeToEdit.setName(officeName);
                 officeFacade.update(officeToEdit);
             }
-            
-            request.setAttribute("office", officeToEdit);
-            request.setAttribute("content", "office/office.jsp");
-        }
-        else {
-            
-            if(StringUtils.isNotEmpty(regionId))
-            {
-                Region region = regionFacade.find(new BigDecimal(regionId));
-                request.setAttribute("offices", officeFacade.list(region));
-                request.setAttribute("region", region);
-                request.setAttribute("content", "office/offices.jsp");
-            }
-            else
-            {
-                request.setAttribute("countries", countryFacade.list());
-                request.setAttribute("content", "country/countries.jsp");
-            }
-
-        }
-        
-        request.getRequestDispatcher("index.jsp").forward(request, response);
-        
+        }        
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
