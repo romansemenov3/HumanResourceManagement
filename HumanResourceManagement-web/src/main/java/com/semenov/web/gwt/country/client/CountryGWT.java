@@ -2,6 +2,11 @@ package com.semenov.web.gwt.country.client;
 
 import com.google.gwt.http.client.URL;
 
+/**
+ * <code>Country</code> GWT representation
+ * 
+ * @author Roman Semenov <romansemenov3@gmail.com>
+ */
 public class CountryGWT {
 	/**
 	 * Country ID number

@@ -7,7 +7,6 @@ package com.semenov.web.export;
 
 import com.semenov.core.data.json.JSONException;
 import com.semenov.core.data.json.JSONExport;
-import com.semenov.core.data.xml.XMLException;
 import java.io.IOException;
 import java.io.OutputStream;
 import javax.ejb.EJB;

@@ -1,4 +1,4 @@
-package com.semenov.web.gwt.region.client;
+package com.semenov.web.gwt.staff.client;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,36 +15,74 @@ import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.RootPanel;
+import com.semenov.web.gwt.country.client.CountryFacadeGWT;
+import com.semenov.web.gwt.office.client.OfficeFacadeGWT;
+import com.semenov.web.gwt.region.client.RegionFacadeGWT;
 
 /**
- * <code>RegionGWT</code> JSON facade
+ * <code>StaffGWT</code> JSON facade
  * 
  * @author Roman Semenov <romansemenov3@gmail.com>
  */
-public class RegionFacadeGWT {
+public class StaffFacadeGWT {
 	
 	private static final String JSON_URL = "json";
-	private static final String EXTERNAL_JSON_URL = "../region/json";
-	
 	private static final String EDIT_URL = "edit";
 	private static final String DELETE_URL = "delete";
 	private static final String ADD_URL = "add";
 	
 	/**
-	 * Region representation for JSON
+	 * Staff representation for JSON
 	 */
-	private static class RegionRecord extends JavaScriptObject 
+	private static class StaffRecord extends JavaScriptObject 
 	{
-		protected RegionRecord(){}
+		protected StaffRecord(){}
 		
 		/**
-		 * @return Region ID number
+		 * @return Staff ID number
 		 */
 		public final native String getID() /*-{ return this.id }-*/;
 		/**
-		 * @return Region name
+		 * @return Staff firstName
 		 */
-		public final native String getName() /*-{ return this.name }-*/;
+		public final native String getFirstName() /*-{ return this.firstName }-*/;
+		/**
+		 * @return Staff secondName
+		 */
+		public final native String getSecondName() /*-{ return this.secondName }-*/;
+	};
+	
+	/**
+	 * Extended Staff representation for JSON
+	 */
+	private static class StaffRecordExtended extends JavaScriptObject 
+	{
+		protected StaffRecordExtended(){}
+		
+		/**
+		 * @return Staff ID number
+		 */
+		public final native String getID() /*-{ return this.id }-*/;
+		/**
+		 * @return Staff firstName
+		 */
+		public final native String getFirstName() /*-{ return this.firstName }-*/;
+		/**
+		 * @return Staff secondName
+		 */
+		public final native String getSecondName() /*-{ return this.secondName }-*/;
+		/**
+		 * @return Staff countryId
+		 */
+		public final native String getCountryId() /*-{ return this.countryId }-*/;
+		/**
+		 * @return Staff regionId
+		 */
+		public final native String getRegionId() /*-{ return this.regionId }-*/;
+		/**
+		 * @return Staff officeId
+		 */
+		public final native String getOfficeId() /*-{ return this.officeId }-*/;
 	};
 	
 	
@@ -56,14 +94,14 @@ public class RegionFacadeGWT {
 	}
 	
 	/**
-	 * Loads page of regions
+	 * Loads page of employees
 	 * @param pageLength - page length
 	 * @param pageNumber - page number
 	 * @param target - target table
 	 */
-	public static void load(String country_id, int pageLength, int pageNumber, final CellTable<RegionGWT> target)
+	public static void load(final String office_id, int pageLength, int pageNumber, final CellTable<StaffGWT> target)
 	{
-		String url = RegionFacadeGWT.JSON_URL + "?country_id=" + country_id + "&length=" + String.valueOf(pageLength) + "&page=" + String.valueOf(pageNumber);
+		String url = StaffFacadeGWT.JSON_URL + "?office_id=" + office_id + "&length=" + String.valueOf(pageLength) + "&page=" + String.valueOf(pageNumber);
 		
 		RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, url);
 		try {
@@ -71,12 +109,15 @@ public class RegionFacadeGWT {
 				{
 					@Override
 					public void onResponseReceived(Request request,	Response response) {						
-						final List<RegionGWT> result = new ArrayList<RegionGWT>();
+						final List<StaffGWT> result = new ArrayList<StaffGWT>();
 						
-						JsArray<RegionRecord> source = JsonUtils.<JsArray<RegionRecord>>safeEval(response.getText());
+						JsArray<StaffRecord> source = JsonUtils.<JsArray<StaffRecord>>safeEval(response.getText());
 						
 						for(int i = 0; i < source.length(); ++i)
-							result.add(new RegionGWT(String.valueOf(source.get(i).getID()), String.valueOf(source.get(i).getName())));
+							result.add(new StaffGWT(String.valueOf(source.get(i).getID()),
+									                String.valueOf(source.get(i).getFirstName()),
+									                String.valueOf(source.get(i).getSecondName()),
+									                office_id));
 						
 						target.setRowCount(result.size());
 						target.setRowData(result);
@@ -93,21 +134,21 @@ public class RegionFacadeGWT {
 	}
 	
 	/**
-	 * Adds region and reloads data
+	 * Adds employee and reloads data
 	 * @param pageLength - page length
 	 * @param pageNumber - page number
 	 * @param target - target table
 	 * @throws RequestException
 	 */
-	public static void add(final String country_id, final int pageLength, final int pageNumber, final CellTable<RegionGWT> target) throws RequestException
+	public static void add(final String office_id, final int pageLength, final int pageNumber, final CellTable<StaffGWT> target) throws RequestException
 	{		
-		RequestBuilder builder = new RequestBuilder(RequestBuilder.POST, RegionFacadeGWT.ADD_URL + "?country_id=" + country_id);
+		RequestBuilder builder = new RequestBuilder(RequestBuilder.POST, StaffFacadeGWT.ADD_URL + "?region_id=" + office_id);
 		
 		builder.sendRequest(null, new RequestCallback() 
 			{
 				@Override
 				public void onResponseReceived(Request request,	Response response) {
-					RegionFacadeGWT.load(country_id, pageLength, pageNumber, target);
+					StaffFacadeGWT.load(office_id, pageLength, pageNumber, target);
 				}
 
 				@Override
@@ -118,22 +159,23 @@ public class RegionFacadeGWT {
 	}
 	
 	/**
-	 * Deletes region and reloads data
+	 * Deletes employee and reloads data
+	 * @param office_id - office ID
 	 * @param pageLength - page length
 	 * @param pageNumber - page number
-	 * @param object - region to delete
+	 * @param object - employee to delete
 	 * @param target - target table
 	 * @throws RequestException
 	 */
-	public static void delete(final String country_id, final int pageLength, final int pageNumber, RegionGWT object, final CellTable<RegionGWT> target) throws RequestException
+	public static void delete(final String office_id, final int pageLength, final int pageNumber, StaffGWT object, final CellTable<StaffGWT> target) throws RequestException
 	{		
-		RequestBuilder builder = new RequestBuilder(RequestBuilder.POST, RegionFacadeGWT.DELETE_URL);
+		RequestBuilder builder = new RequestBuilder(RequestBuilder.POST, StaffFacadeGWT.DELETE_URL);
 		builder.setHeader("Content-type", "application/x-www-form-urlencoded");
 		
 		builder.sendRequest(object.getDeleteData(), new RequestCallback() {
 
 			public void onResponseReceived(Request request, Response response) {
-				RegionFacadeGWT.load(country_id, pageLength, pageNumber, target);
+				StaffFacadeGWT.load(office_id, pageLength, pageNumber, target);
             }
 			
 			public void onError(Request request, Throwable exception) {
@@ -143,22 +185,22 @@ public class RegionFacadeGWT {
 	}
 	
 	/**
-	 * Edits region and reloads data
+	 * Edits employee and reloads data
 	 * @param pageLength - page length
 	 * @param pageNumber - page number
-	 * @param object - region to edit
+	 * @param object - employee to edit
 	 * @param target - target table
 	 * @throws RequestException
 	 */
-	public static void edit(final String country_id, final int pageLength, final int pageNumber, RegionGWT object, final CellTable<RegionGWT> target) throws RequestException
+	public static void edit(final String office_id, final int pageLength, final int pageNumber, StaffGWT object, final CellTable<StaffGWT> target) throws RequestException
 	{		
-		RequestBuilder builder = new RequestBuilder(RequestBuilder.POST, RegionFacadeGWT.EDIT_URL);
+		RequestBuilder builder = new RequestBuilder(RequestBuilder.POST, StaffFacadeGWT.EDIT_URL);
 		builder.setHeader("Content-type", "application/x-www-form-urlencoded");
 		
 		builder.sendRequest(object.getEditData(), new RequestCallback() {
 
 			public void onResponseReceived(Request request, Response response) {
-				RegionFacadeGWT.load(country_id, pageLength, pageNumber, target);
+				StaffFacadeGWT.load(office_id, pageLength, pageNumber, target);
             }
 			
 			public void onError(Request request, Throwable exception) {
@@ -172,9 +214,9 @@ public class RegionFacadeGWT {
 	 * @param length - page length
 	 * @param target - target ListBox
 	 */
-	public static void updatePageList(String country_id, int length, final ListBox target)
+	public static void updatePageList(String office_id, int length, final ListBox target)
 	{		
-		String url = RegionFacadeGWT.JSON_URL + "?country_id=" + country_id + "&length=" + String.valueOf(length);
+		String url = StaffFacadeGWT.JSON_URL + "?office_id=" + office_id + "&length=" + String.valueOf(length);
 		
 		RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, url);
 		try {
@@ -202,28 +244,21 @@ public class RegionFacadeGWT {
 		}
 	}
 	
-	public static void fillRegionsList(final String country_id, final ListBox target, final String choose)
+	public static void fillEditorLists(String id_extended, final ListBox countries, final ListBox regions, final ListBox offices)
 	{
-		String url = RegionFacadeGWT.EXTERNAL_JSON_URL + "?country_id=" + country_id;
+		String url = StaffFacadeGWT.JSON_URL + "?id_extended=" + id_extended;
 		
 		RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, url);
 		try {
 			builder.sendRequest(null, new RequestCallback() 
 				{
 					@Override
-					public void onResponseReceived(Request request,	Response response) {
+					public void onResponseReceived(Request request,	Response response) {						
+						StaffRecordExtended source = JsonUtils.<StaffRecordExtended>safeEval(response.getText());
 						
-						JsArray<RegionRecord> source = JsonUtils.<JsArray<RegionRecord>>safeEval(response.getText());
-						
-						target.clear();
-						target.addItem("Choose region", "-1");
-						target.setSelectedIndex(0);
-						for(int i = 0; i < source.length(); ++i)
-						{
-							target.addItem(String.valueOf(source.get(i).getName()), String.valueOf(source.get(i).getID()));
-							if(String.valueOf(source.get(i).getID()).equals(choose))
-								target.setSelectedIndex(i + 1);
-						}
+						CountryFacadeGWT.fillCountriesList(countries, String.valueOf(source.getCountryId()));
+						RegionFacadeGWT.fillRegionsList(String.valueOf(source.getCountryId()), regions, String.valueOf(source.getRegionId()));
+						OfficeFacadeGWT.fillOfficesList(String.valueOf(source.getRegionId()), offices, String.valueOf(source.getOfficeId()));
 					}
 
 					@Override

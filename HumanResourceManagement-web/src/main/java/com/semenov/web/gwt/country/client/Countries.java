@@ -22,10 +22,15 @@ import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.http.client.RequestException;
 
+/**
+ * <code>countries.html</code> entry point
+ * 
+ * @author Roman Semenov <romansemenov3@gmail.com>
+ */
 public class Countries implements EntryPoint {	
 	
 	private final CellTable<CountryGWT> countries = new CellTable<CountryGWT>();
-	private int pageLength = 25;
+	private int pageLength = 10;
 	private int pageNumber = 0;
 	
 	/**

@@ -50,6 +50,7 @@ public class OfficeJsonServlet extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
+    	//?region_id=i
     	//?region_id=i&length=x
     	//?region_id=i&length=x&page=y
     	//?id=x
@@ -57,26 +58,33 @@ public class OfficeJsonServlet extends HttpServlet {
     	Gson gson = new GsonBuilder().serializeNulls().excludeFieldsWithoutExposeAnnotation().create();
     	String officesData = "";
     	
-    	String regionId = request.getParameter("region_id");
-    	String pageLength = request.getParameter("length");
+    	String regionId = request.getParameter("region_id");    	
     	
-        if (StringUtils.isNotEmpty(regionId) && StringUtils.isNotEmpty(pageLength)) {
+        if (StringUtils.isNotEmpty(regionId)) {
             Region region = regionFacade.find(new BigDecimal(regionId));
             if(region != null)
             {            
-	        	int length = Integer.parseInt(pageLength);            	
-	            	
-	        	String pageNumber = request.getParameter("page");
-	            if (StringUtils.isNotEmpty(pageNumber)) {
-	            	officesData = gson.toJson(officeFacade.page(region, length, Integer.parseInt(pageNumber)));
-	            }
-	            else
-	            {
-	            	officesData = "{\"pages\":\""
-	            					+ String.valueOf(officeFacade.getRowCount(region) / length + 
-	            									((officeFacade.getRowCount(region) % length == 0) ? 0 : 1)) +
-	            					"\"}";
-	            }
+            	String pageLength = request.getParameter("length"); 
+            	if(StringUtils.isNotEmpty(pageLength))
+            	{            	
+	            	int length = Integer.parseInt(pageLength);            	
+		            	
+		        	String pageNumber = request.getParameter("page");
+		            if (StringUtils.isNotEmpty(pageNumber)) {
+		            	officesData = gson.toJson(officeFacade.page(region, length, Integer.parseInt(pageNumber)));
+		            }
+		            else
+		            {
+		            	officesData = "{\"pages\":\""
+		            					+ String.valueOf(officeFacade.getRowCount(region) / length + 
+		            									((officeFacade.getRowCount(region) % length == 0) ? 0 : 1)) +
+		            					"\"}";
+		            }
+            	}
+            	else
+            	{
+            		officesData = gson.toJson(officeFacade.list(region));
+            	}
             }
         }
         else

@@ -5,14 +5,11 @@
  */
 package com.semenov.web.region;
 
-import com.semenov.web.office.*;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.semenov.core.data.accessobjects.CountryFacade;
-import com.semenov.core.data.accessobjects.OfficeFacade;
 import com.semenov.core.data.accessobjects.RegionFacade;
 import com.semenov.core.data.entities.Country;
-import com.semenov.core.data.entities.Region;
 import com.semenov.core.utils.StringUtils;
 
 import java.io.IOException;
@@ -51,6 +48,7 @@ public class RegionJsonServlet extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
+    	//?country_id=i
     	//?country_id=i&length=x
     	//?country_id=i&length=x&page=y
     	//?id=x
@@ -59,26 +57,33 @@ public class RegionJsonServlet extends HttpServlet {
     	String regionsData = "";
     	
     	String countryId = request.getParameter("country_id");
-    	String pageLength = request.getParameter("length");
     	
-        if (StringUtils.isNotEmpty(countryId) && StringUtils.isNotEmpty(pageLength)) {
+        if (StringUtils.isNotEmpty(countryId)) {
 
             Country country = countryFacade.find(new BigDecimal(countryId));
             if(country != null)
             {            
-	        	int length = Integer.parseInt(pageLength);            	
-	            	
-	        	String pageNumber = request.getParameter("page");
-	            if (StringUtils.isNotEmpty(pageNumber)) {
-	            	regionsData = gson.toJson(regionFacade.page(country, length, Integer.parseInt(pageNumber)));
-	            }
-	            else
-	            {
-	            	regionsData = "{\"pages\":\""
-	            					+ String.valueOf(regionFacade.getRowCount(country) / length + 
-	            									((regionFacade.getRowCount(country) % length == 0) ? 0 : 1)) +
-	            					"\"}";
-	            }
+            	String pageLength = request.getParameter("length");
+            	if(StringUtils.isNotEmpty(pageLength))
+            	{            	
+	            	int length = Integer.parseInt(pageLength);            	
+		            	
+		        	String pageNumber = request.getParameter("page");
+		            if (StringUtils.isNotEmpty(pageNumber)) {
+		            	regionsData = gson.toJson(regionFacade.page(country, length, Integer.parseInt(pageNumber)));
+		            }
+		            else
+		            {
+		            	regionsData = "{\"pages\":\""
+		            					+ String.valueOf(regionFacade.getRowCount(country) / length + 
+		            									((regionFacade.getRowCount(country) % length == 0) ? 0 : 1)) +
+		            					"\"}";
+		            }
+            	}
+            	else
+            	{
+            		regionsData = gson.toJson(regionFacade.list(country));
+            	}
             }
         }
         else

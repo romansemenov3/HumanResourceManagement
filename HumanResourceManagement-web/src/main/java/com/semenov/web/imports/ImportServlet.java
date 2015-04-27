@@ -5,11 +5,9 @@
  */
 package com.semenov.web.imports;
 
-import com.semenov.core.data.entities.Country;
 import com.semenov.core.data.xml.DataImporter;
 
 import java.io.IOException;
-import java.math.BigDecimal;
 
 import javax.ejb.EJB;
 import javax.servlet.annotation.MultipartConfig;

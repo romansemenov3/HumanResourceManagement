@@ -3,9 +3,12 @@ package com.semenov.web.staff;
 import com.google.gson.annotations.Expose;
 import com.semenov.core.data.entities.Staff;
 
+
 /**
- * Extended version of Staff JSON record
- */
+* Extended version of Staff JSON record
+* 
+* @author Roman Semenov <romansemenov3@gmail.com>
+*/
 public class StaffExtendedJSON {
 	/**
 	 * Staff ID

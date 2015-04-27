@@ -5,7 +5,6 @@
  */
 package com.semenov.web.staff;
 
-import com.semenov.core.data.accessobjects.CountryFacade;
 import com.semenov.core.data.accessobjects.OfficeFacade;
 import com.semenov.core.data.accessobjects.StaffFacade;
 import com.semenov.core.data.entities.Office;

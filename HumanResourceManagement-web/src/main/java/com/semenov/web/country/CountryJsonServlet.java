@@ -8,13 +8,11 @@ package com.semenov.web.country;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.semenov.core.data.accessobjects.CountryFacade;
-import com.semenov.core.data.entities.Country;
 import com.semenov.core.utils.StringUtils;
 
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.math.BigDecimal;
-import java.math.BigInteger;
 
 import javax.ejb.EJB;
 import javax.servlet.ServletException;
@@ -72,6 +70,10 @@ public class CountryJsonServlet extends HttpServlet {
         	String countryID = request.getParameter("id");
         	if (StringUtils.isNotEmpty(countryID)) { 
         		countriesData = gson.toJson(countryFacade.find(new BigDecimal(countryID)));
+        	}
+        	else
+        	{
+        		countriesData = gson.toJson(countryFacade.list());
         	}
         }
 

@@ -2,6 +2,11 @@ package com.semenov.web.gwt.region.client;
 
 import com.google.gwt.http.client.URL;
 
+/**
+ * <code>Office</code> GWT representation
+ * 
+ * @author Roman Semenov <romansemenov3@gmail.com>
+ */
 public class RegionGWT {
 	/**
 	 * Region ID number

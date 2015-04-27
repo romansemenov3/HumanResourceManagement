@@ -2,6 +2,11 @@ package com.semenov.web.gwt.office.client;
 
 import com.google.gwt.http.client.URL;
 
+/**
+ * <code>Office</code> GWT representation
+ * 
+ * @author Roman Semenov <romansemenov3@gmail.com>
+ */
 public class OfficeGWT {
 	/**
 	 * Office ID number

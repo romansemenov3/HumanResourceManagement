@@ -11,32 +11,38 @@ import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.RequestException;
 import com.google.gwt.http.client.Response;
-import com.google.gwt.http.client.URL;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.RootPanel;
 
+/**
+ * <code>OfficeGWT</code> JSON facade
+ * 
+ * @author Roman Semenov <romansemenov3@gmail.com>
+ */
 public class OfficeFacadeGWT {
 	
 	private static final String JSON_URL = "json";
+	private static final String EXTERNAL_JSON_URL = "../office/json";
+	
 	private static final String EDIT_URL = "edit";
 	private static final String DELETE_URL = "delete";
 	private static final String ADD_URL = "add";
 	
 	/**
-	 * Country representation for JSON
+	 * Office representation for JSON
 	 */
-	private static class RegionRecord extends JavaScriptObject 
+	private static class OfficeRecord extends JavaScriptObject 
 	{
-		protected RegionRecord(){}
+		protected OfficeRecord(){}
 		
 		/**
-		 * @return Country ID number
+		 * @return Office ID number
 		 */
 		public final native String getID() /*-{ return this.id }-*/;
 		/**
-		 * @return Country name
+		 * @return Office name
 		 */
 		public final native String getName() /*-{ return this.name }-*/;
 	};
@@ -50,7 +56,7 @@ public class OfficeFacadeGWT {
 	}
 	
 	/**
-	 * Loads page of countries
+	 * Loads page of offices
 	 * @param pageLength - page length
 	 * @param pageNumber - page number
 	 * @param target - target table
@@ -67,7 +73,7 @@ public class OfficeFacadeGWT {
 					public void onResponseReceived(Request request,	Response response) {						
 						final List<OfficeGWT> result = new ArrayList<OfficeGWT>();
 						
-						JsArray<RegionRecord> source = JsonUtils.<JsArray<RegionRecord>>safeEval(response.getText());
+						JsArray<OfficeRecord> source = JsonUtils.<JsArray<OfficeRecord>>safeEval(response.getText());
 						
 						for(int i = 0; i < source.length(); ++i)
 							result.add(new OfficeGWT(String.valueOf(source.get(i).getID()), String.valueOf(source.get(i).getName())));
@@ -87,7 +93,7 @@ public class OfficeFacadeGWT {
 	}
 	
 	/**
-	 * Adds region and reloads data
+	 * Adds office and reloads data
 	 * @param pageLength - page length
 	 * @param pageNumber - page number
 	 * @param target - target table
@@ -112,10 +118,10 @@ public class OfficeFacadeGWT {
 	}
 	
 	/**
-	 * Deletes region and reloads data
+	 * Deletes office and reloads data
 	 * @param pageLength - page length
 	 * @param pageNumber - page number
-	 * @param object - country to delete
+	 * @param object - office to delete
 	 * @param target - target table
 	 * @throws RequestException
 	 */
@@ -137,10 +143,10 @@ public class OfficeFacadeGWT {
 	}
 	
 	/**
-	 * Edits region and reloads data
+	 * Edits office and reloads data
 	 * @param pageLength - page length
 	 * @param pageNumber - page number
-	 * @param object - country to edit
+	 * @param object - office to edit
 	 * @param target - target table
 	 * @throws RequestException
 	 */
@@ -166,10 +172,8 @@ public class OfficeFacadeGWT {
 	 * @param length - page length
 	 * @param target - target ListBox
 	 */
-	public static int updatePageList(String region_id, int length, final ListBox target)
-	{
-		final Integer result = new Integer(0);
-		
+	public static void updatePageList(String region_id, int length, final ListBox target)
+	{		
 		String url = OfficeFacadeGWT.JSON_URL + "?region_id=" + region_id + "&length=" + String.valueOf(length);
 		
 		RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, url);
@@ -196,7 +200,39 @@ public class OfficeFacadeGWT {
 		} catch (RequestException e) {
 			RootPanel.get().add(new Label("UpdatePageListRequestError: " + e.getMessage()));
 		}
+	}
+	
+	public static void fillOfficesList(final String region_id, final ListBox target, final String choose)
+	{
+		String url = OfficeFacadeGWT.EXTERNAL_JSON_URL + "?region_id=" + region_id;
 		
-		return result;
+		RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, url);
+		try {
+			builder.sendRequest(null, new RequestCallback() 
+				{
+					@Override
+					public void onResponseReceived(Request request,	Response response) {
+						
+						JsArray<OfficeRecord> source = JsonUtils.<JsArray<OfficeRecord>>safeEval(response.getText());
+						
+						target.clear();
+						target.addItem("Choose office", "-1");
+						target.setSelectedIndex(0);
+						for(int i = 0; i < source.length(); ++i)
+						{
+							target.addItem(String.valueOf(source.get(i).getName()), String.valueOf(source.get(i).getID()));
+							if(String.valueOf(source.get(i).getID()).equals(choose))
+								target.setSelectedIndex(i + 1);
+						}
+					}
+
+					@Override
+					public void onError(Request request, Throwable exception) {
+						RootPanel.get().add(new Label("RequestError: " + exception.getMessage()));
+					}
+				});
+		} catch (RequestException e) {
+			RootPanel.get().add(new Label("UpdatePageListRequestError: " + e.getMessage()));
+		}
 	}
 }

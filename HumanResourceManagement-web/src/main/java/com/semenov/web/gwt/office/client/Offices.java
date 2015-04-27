@@ -22,10 +22,15 @@ import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.http.client.RequestException;
 
+/**
+ * <code>offices.html</code> entry point
+ * 
+ * @author Roman Semenov <romansemenov3@gmail.com>
+ */
 public class Offices implements EntryPoint {	
 	
 	private final CellTable<OfficeGWT> offices = new CellTable<OfficeGWT>();
-	private int pageLength = 25;
+	private int pageLength = 10;
 	private int pageNumber = 0;
 	
 	private String region_id;
@@ -257,5 +262,4 @@ public class Offices implements EntryPoint {
 			
 		}
 	}
-
 }

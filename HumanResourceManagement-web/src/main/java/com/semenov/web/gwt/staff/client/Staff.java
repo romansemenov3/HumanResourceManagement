@@ -1,13 +1,14 @@
-package com.semenov.web.gwt.region.client;
+package com.semenov.web.gwt.staff.client;
 
 import com.google.gwt.cell.client.ButtonCell;
-import com.google.gwt.cell.client.ClickableTextCell;
 import com.google.gwt.cell.client.FieldUpdater;
+import com.google.gwt.cell.client.TextCell;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.http.client.RequestException;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.TextColumn;
@@ -20,25 +21,27 @@ import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.http.client.RequestException;
+import com.semenov.web.gwt.country.client.CountryFacadeGWT;
+import com.semenov.web.gwt.office.client.OfficeFacadeGWT;
+import com.semenov.web.gwt.region.client.RegionFacadeGWT;
 
 /**
- * <code>regions.html</code> entry point
+ * <code>staff.html</code> entry point
  * 
  * @author Roman Semenov <romansemenov3@gmail.com>
  */
-public class Regions implements EntryPoint {	
-	
-	private final CellTable<RegionGWT> regions = new CellTable<RegionGWT>();
+public class Staff implements EntryPoint {
+
+	private final CellTable<StaffGWT> offices = new CellTable<StaffGWT>();
 	private int pageLength = 10;
 	private int pageNumber = 0;
 	
-	private String country_id;
+	private String office_id;
 	
 	/**
 	 * Data editor popup panel
 	 */
-	private class RegionEditPanel extends PopupPanel
+	private class StaffEditPanel extends PopupPanel
 	{
 		/**
 		 * Table with editor components
@@ -48,20 +51,53 @@ public class Regions implements EntryPoint {
 			private Button save;
 			private Button cancel;
 			
-			private TextBox name;
+			private TextBox firstName;
+			private TextBox secondName;
 			
-			public DataTable(final RegionGWT region)
+			private ListBox countriesList;
+			private ListBox regionsList;
+			private ListBox officesList;			
+			
+			public DataTable(final StaffGWT staff)
 			{
-				name = new TextBox();
-				name.setValue(region.getName());
+				firstName = new TextBox();
+				firstName.setValue(staff.getFirstName());
+				
+				secondName = new TextBox();
+				secondName.setValue(staff.getSecondName());
+				
+				countriesList = new ListBox();
+				countriesList.addChangeHandler(new ChangeHandler(){
+					@Override
+					public void onChange(ChangeEvent event) {
+						RegionFacadeGWT.fillRegionsList(countriesList.getSelectedValue(), regionsList, null);
+					}					
+				});
+				
+				regionsList = new ListBox();
+				regionsList.addChangeHandler(new ChangeHandler(){
+					@Override
+					public void onChange(ChangeEvent event) {
+						OfficeFacadeGWT.fillOfficesList(regionsList.getSelectedValue(), officesList, null);
+					}					
+				});
+				
+				officesList = new ListBox();
+				officesList.addChangeHandler(new ChangeHandler(){
+					@Override
+					public void onChange(ChangeEvent event) {
+						staff.setOfficeId(officesList.getSelectedValue());
+					}
+				});
 				
 				save = new Button("Save");
 				save.addClickHandler(new ClickHandler(){
 					@Override
 					public void onClick(ClickEvent event) {
 						try {
-							region.setName(name.getValue());
-							RegionFacadeGWT.edit(country_id, pageLength, pageNumber, region, regions);
+							staff.setFirstName(firstName.getValue());
+							staff.setSecondName(secondName.getValue());
+							StaffFacadeGWT.edit(office_id, pageLength, pageNumber, staff, offices);
 							hide();
 						} catch (RequestException e) {
 							RootPanel.get().add(new Label("EditRequestError: " + e.getMessage()));
@@ -79,8 +115,12 @@ public class Regions implements EntryPoint {
 				
 				Object[][] rowData = { 
 					{new Label("Column Name"), new Label("Column Value")},
-					{new Label("Region ID"), new Label(region.getID())},
-					{new Label("Region Name"), name},
+					{new Label("Staff ID"), new Label(staff.getID())},
+					{new Label("Staff First Name"), firstName},
+					{new Label("Staff Second Name"), secondName},
+					{new Label("Staff Country"), countriesList},
+					{new Label("Staff Region"), regionsList},
+					{new Label("Staff Office"), officesList},
 					{save, cancel},
 				};
 				
@@ -102,34 +142,36 @@ public class Regions implements EntryPoint {
 				this.getCellFormatter().setStylePrimaryName(lastRow, 1, "popupColumnButton");
 				
 				this.setStylePrimaryName("popupTable");
+				
+				StaffFacadeGWT.fillEditorLists(staff.getID(), countriesList, regionsList, officesList);
 			}
 		}
 		
-		public RegionEditPanel(final RegionGWT region)
+		public StaffEditPanel(final StaffGWT office)
 		{
 			super(false);
 			this.center();
-			this.add(new DataTable(region));
+			this.add(new DataTable(office));
 			this.setStylePrimaryName("popupDiv");
 		}
 	}
 	
 	private class HeaderTable extends FlexTable
 	{
-		private final Button addButton = new Button("Add Region");
+		private final Button addButton = new Button("Add Staff");
 		private final ListBox pageNumberListBox = new ListBox();
 		private final ListBox pageLengthListBox = new ListBox();
 		
 		private void pageNumberListBoxChange()
 		{
 			pageNumber = Integer.parseInt(pageNumberListBox.getSelectedValue());
-			RegionFacadeGWT.load(country_id, pageLength, pageNumber, regions);
+			StaffFacadeGWT.load(office_id, pageLength, pageNumber, offices);
 		}
 		
 		private void pageLengthListBoxChange()
 		{
 			pageLength = Integer.parseInt(pageLengthListBox.getSelectedValue());
-			RegionFacadeGWT.updatePageList(country_id, pageLength, pageNumberListBox);
+			StaffFacadeGWT.updatePageList(office_id, pageLength, pageNumberListBox);
 			
 			pageNumberListBox.setSelectedIndex(0);
 			pageNumberListBoxChange();
@@ -144,7 +186,7 @@ public class Regions implements EntryPoint {
 						pageLengthListBoxChange();
 						pageNumberListBox.setSelectedIndex(pageNumberListBox.getItemCount() - 1);
 						pageNumberListBoxChange();
-						RegionFacadeGWT.add(country_id, pageLength, pageNumber, regions);
+						StaffFacadeGWT.add(office_id, pageLength, pageNumber, offices);
 					} catch (RequestException e) {
 						RootPanel.get().add(new Label("AddRequestError: " + e.getMessage()));
 					}
@@ -168,7 +210,7 @@ public class Regions implements EntryPoint {
 					pageNumberListBoxChange();
 				}				
 			});
-			RegionFacadeGWT.updatePageList(country_id, pageLength, pageNumberListBox);
+			StaffFacadeGWT.updatePageList(office_id, pageLength, pageNumberListBox);
 			
 			setWidget(0, 0, addButton);
 			setWidget(0, 1, pageLengthListBox);
@@ -179,88 +221,91 @@ public class Regions implements EntryPoint {
 	}
 	
 	/**
-	 * Creates table for regions
-	 * @return - table for regions
+	 * Creates table for offices
+	 * @return - table for offices
 	 * @throws RequestException
 	 */
 	private void buildTable() throws RequestException
 	{		
-		//"Region ID" row
-		TextColumn<RegionGWT> id = new TextColumn<RegionGWT>() {
+		//"Staff ID" row
+		TextColumn<StaffGWT> id = new TextColumn<StaffGWT>() {
 		    @Override
-			    public String getValue(RegionGWT row) {
+			    public String getValue(StaffGWT row) {
 			    	return row.getID();
 			    }
 			};
-		this.regions.addColumn(id, "Region ID");
+		this.offices.addColumn(id, "Staff ID");
 		
-		//"Region Name" row
-		ClickableTextCell nameCell = new ClickableTextCell();
-		Column<RegionGWT, String> name = new Column<RegionGWT, String>(nameCell) {
+		//"Staff First Name" row
+		TextCell firstNameCell = new TextCell();
+		Column<StaffGWT, String> firstName = new Column<StaffGWT, String>(firstNameCell) {
 			@Override
-			public String getValue(RegionGWT object) {
-				return object.getName();
+			public String getValue(StaffGWT object) {
+				return object.getFirstName();
 			}			
 	    };
-	    name.setFieldUpdater(new FieldUpdater<RegionGWT, String>() {
-			@Override
-			public void update(int index, RegionGWT object, String value) {
-				Window.open("../office/offices.html?region_id=" + object.getID(), "_blank", "");
-			}
-	    });
-	    this.regions.addColumn(name, "Region Name");
+	    this.offices.addColumn(firstName, "Staff First Name");
+	    
+	    //"Staff Second Name" row
+  		TextCell secondNameCell = new TextCell();
+  		Column<StaffGWT, String> secondName = new Column<StaffGWT, String>(secondNameCell) {
+  			@Override
+  			public String getValue(StaffGWT object) {
+  				return object.getSecondName();
+  			}			
+  	    };
+  	    this.offices.addColumn(secondName, "Staff Second Name");
 		
-		//"Edit Region" row
+		//"Edit Staff" row
 		ButtonCell editCell = new ButtonCell();
-		Column<RegionGWT, String> edit = new Column<RegionGWT, String>(editCell) {
+		Column<StaffGWT, String> edit = new Column<StaffGWT, String>(editCell) {
 			@Override
-			public String getValue(RegionGWT object) {
-				return "Edit " + object.getName();
+			public String getValue(StaffGWT object) {
+				return "Edit " + object.getFirstName() + " " + object.getSecondName();
 			}			
 	    };
-	    edit.setFieldUpdater(new FieldUpdater<RegionGWT, String>() {
+	    edit.setFieldUpdater(new FieldUpdater<StaffGWT, String>() {
 			@Override
-			public void update(int index, RegionGWT object, String value) {					
-				new RegionEditPanel(object).show();
+			public void update(int index, StaffGWT object, String value) {					
+				new StaffEditPanel(object).show();
 			}
 	    });
-	    this.regions.addColumn(edit, "Edit Region");
+	    this.offices.addColumn(edit, "Edit Staff");
 		
-		//"Delete Region" row
+		//"Delete Staff" row
 		ButtonCell deleteCell = new ButtonCell();
-		Column<RegionGWT, String> delete = new Column<RegionGWT, String>(deleteCell) {
+		Column<StaffGWT, String> delete = new Column<StaffGWT, String>(deleteCell) {
 			@Override
-			public String getValue(RegionGWT object) {
-				return "Delete " + object.getName();
+			public String getValue(StaffGWT object) {
+				return "Delete " + object.getFirstName() + " " + object.getSecondName();
 			}			
 	    };
-	    delete.setFieldUpdater(new FieldUpdater<RegionGWT, String>() {
+	    delete.setFieldUpdater(new FieldUpdater<StaffGWT, String>() {
 			@Override
-			public void update(int index, RegionGWT object, String value) {					
+			public void update(int index, StaffGWT object, String value) {					
 				try {
-					RegionFacadeGWT.delete(country_id, pageLength, pageNumber, object, regions);
+					StaffFacadeGWT.delete(office_id, pageLength, pageNumber, object, offices);
 				} catch (RequestException e) {
 					RootPanel.get().add(new Label("DeleteRequestError: " + e.getMessage()));
 				}
 			}
 	    });
-	    this.regions.addColumn(delete, "Delete Region");
+	    this.offices.addColumn(delete, "Delete Staff");
 	}
 	
 	@Override
 	public void onModuleLoad() {
 		try {
-			country_id = Window.Location.getParameter("country_id");
+			office_id = Window.Location.getParameter("office_id");
 			
 			buildTable();
-			RegionFacadeGWT.load(country_id, pageLength, pageNumber, this.regions);
+			StaffFacadeGWT.load(office_id, pageLength, pageNumber, this.offices);
 			
 			RootPanel.get().add(new HeaderTable());
-			RootPanel.get().add(this.regions);
+			RootPanel.get().add(this.offices);
 			
 		} catch (RequestException e) {
 			
 		}
 	}
-
 }

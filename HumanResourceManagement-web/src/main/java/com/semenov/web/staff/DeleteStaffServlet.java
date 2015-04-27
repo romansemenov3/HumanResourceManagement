@@ -5,10 +5,7 @@
  */
 package com.semenov.web.staff;
 
-import com.semenov.core.data.accessobjects.CountryFacade;
-import com.semenov.core.data.accessobjects.OfficeFacade;
 import com.semenov.core.data.accessobjects.StaffFacade;
-import com.semenov.core.data.entities.Office;
 import com.semenov.core.data.entities.Staff;
 import com.semenov.core.utils.StringUtils;
 import java.io.IOException;
@@ -46,7 +43,6 @@ public class DeleteStaffServlet extends HttpServlet {
         if (StringUtils.isNotEmpty(staffId)) {
             
             Staff staffToDelete = staffFacade.find(new BigDecimal(staffId));
-            Office office = staffToDelete.getOfficeId();
             
             if(staffToDelete != null)
             {

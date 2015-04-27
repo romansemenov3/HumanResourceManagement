@@ -11,15 +11,21 @@ import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.RequestException;
 import com.google.gwt.http.client.Response;
-import com.google.gwt.http.client.URL;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.RootPanel;
 
+/**
+ * <code>CountryGWT</code> JSON facade
+ * 
+ * @author Roman Semenov <romansemenov3@gmail.com>
+ */
 public class CountryFacadeGWT {
 	
 	private static final String JSON_URL = "json";
+	private static final String EXTERNAL_JSON_URL = "../country/json";
+	
 	private static final String EDIT_URL = "edit";
 	private static final String DELETE_URL = "delete";
 	private static final String ADD_URL = "add";
@@ -166,10 +172,8 @@ public class CountryFacadeGWT {
 	 * @param length - page length
 	 * @param target - target ListBox
 	 */
-	public static int updatePageList(int length, final ListBox target)
-	{
-		final Integer result = new Integer(0);
-		
+	public static void updatePageList(int length, final ListBox target)
+	{		
 		String url = CountryFacadeGWT.JSON_URL + "?length=" + String.valueOf(length);
 		
 		RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, url);
@@ -196,9 +200,37 @@ public class CountryFacadeGWT {
 		} catch (RequestException e) {
 			RootPanel.get().add(new Label("UpdatePageListRequestError: " + e.getMessage()));
 		}
-		
-		return result;
 	}
 	
-	
+	public static void fillCountriesList(final ListBox target, final String choose)
+	{
+		RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, CountryFacadeGWT.EXTERNAL_JSON_URL);
+		try {
+			builder.sendRequest(null, new RequestCallback() 
+				{
+					@Override
+					public void onResponseReceived(Request request,	Response response) {
+						
+						JsArray<CountryRecord> source = JsonUtils.<JsArray<CountryRecord>>safeEval(response.getText());
+						
+						target.clear();
+						target.addItem("Choose country", "-1");
+						target.setSelectedIndex(0);
+						for(int i = 0; i < source.length(); ++i)
+						{
+							target.addItem(String.valueOf(source.get(i).getName()), String.valueOf(source.get(i).getID()));
+							if(String.valueOf(source.get(i).getID()).equals(choose))
+								target.setSelectedIndex(i + 1);
+						}
+					}
+
+					@Override
+					public void onError(Request request, Throwable exception) {
+						RootPanel.get().add(new Label("RequestError: " + exception.getMessage()));
+					}
+				});
+		} catch (RequestException e) {
+			RootPanel.get().add(new Label("UpdatePageListRequestError: " + e.getMessage()));
+		}
+	}
 }
