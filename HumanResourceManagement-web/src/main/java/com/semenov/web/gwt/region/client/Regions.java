@@ -3,7 +3,6 @@ package com.semenov.web.gwt.region.client;
 import com.google.gwt.cell.client.ButtonCell;
 import com.google.gwt.cell.client.ClickableTextCell;
 import com.google.gwt.cell.client.FieldUpdater;
-import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -11,7 +10,6 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.TextColumn;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.Label;
@@ -21,15 +19,19 @@ import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.http.client.RequestException;
+import com.semenov.web.gwt.office.client.Offices;
 
 /**
  * <code>regions.html</code> entry point
  * 
  * @author Roman Semenov <romansemenov3@gmail.com>
  */
-public class Regions implements EntryPoint {	
+public class Regions{
 	
 	private final CellTable<RegionGWT> regions = new CellTable<RegionGWT>();
+	private final HeaderTable headerTable = new HeaderTable();
+	private final RootPanel rootPanel = RootPanel.get("regions");
+	private Offices officesModule;
 	private int pageLength = 10;
 	private int pageNumber = 0;
 	
@@ -64,7 +66,7 @@ public class Regions implements EntryPoint {
 							RegionFacadeGWT.edit(country_id, pageLength, pageNumber, region, regions);
 							hide();
 						} catch (RequestException e) {
-							RootPanel.get().add(new Label("EditRequestError: " + e.getMessage()));
+							rootPanel.add(new Label("EditRequestError: " + e.getMessage()));
 						}
 					}
 				});
@@ -146,7 +148,7 @@ public class Regions implements EntryPoint {
 						pageNumberListBoxChange();
 						RegionFacadeGWT.add(country_id, pageLength, pageNumber, regions);
 					} catch (RequestException e) {
-						RootPanel.get().add(new Label("AddRequestError: " + e.getMessage()));
+						rootPanel.add(new Label("AddRequestError: " + e.getMessage()));
 					}
 				}
 			});
@@ -168,13 +170,18 @@ public class Regions implements EntryPoint {
 					pageNumberListBoxChange();
 				}				
 			});
-			RegionFacadeGWT.updatePageList(country_id, pageLength, pageNumberListBox);
 			
 			setWidget(0, 0, addButton);
 			setWidget(0, 1, pageLengthListBox);
 			setWidget(0, 2, pageNumberListBox);
 			
 			this.setStylePrimaryName("headerTable");
+		}
+		
+		public void show()
+		{
+			RegionFacadeGWT.updatePageList(country_id, pageLength, pageNumberListBox);
+			pageNumberListBox.setSelectedIndex(0);
 		}
 	}
 	
@@ -205,7 +212,7 @@ public class Regions implements EntryPoint {
 	    name.setFieldUpdater(new FieldUpdater<RegionGWT, String>() {
 			@Override
 			public void update(int index, RegionGWT object, String value) {
-				Window.open("../office/offices.html?region_id=" + object.getID(), "_blank", "");
+				officesModule.show(object.getID());
 			}
 	    });
 	    this.regions.addColumn(name, "Region Name");
@@ -240,27 +247,47 @@ public class Regions implements EntryPoint {
 				try {
 					RegionFacadeGWT.delete(country_id, pageLength, pageNumber, object, regions);
 				} catch (RequestException e) {
-					RootPanel.get().add(new Label("DeleteRequestError: " + e.getMessage()));
+					rootPanel.add(new Label("DeleteRequestError: " + e.getMessage()));
 				}
 			}
 	    });
 	    this.regions.addColumn(delete, "Delete Region");
 	}
 	
-	@Override
-	public void onModuleLoad() {
-		try {
-			country_id = Window.Location.getParameter("country_id");
+	public Regions(Offices officesModule) {
+		try {			
+			this.officesModule = officesModule;
 			
 			buildTable();
-			RegionFacadeGWT.load(country_id, pageLength, pageNumber, this.regions);
 			
-			RootPanel.get().add(new HeaderTable());
-			RootPanel.get().add(this.regions);
+			rootPanel.add(this.headerTable);
+			rootPanel.add(this.regions);
+			
+			hide();
 			
 		} catch (RequestException e) {
 			
 		}
+	}
+	
+	public void show(String country_id)
+	{
+		this.country_id = country_id;
+		this.pageNumber = 0;
+		this.pageLength = 10;
+		
+		this.headerTable.show();
+		
+		RegionFacadeGWT.load(country_id, pageLength, pageNumber, this.regions);
+		
+		this.officesModule.hide();
+		rootPanel.setVisible(true);
+	}
+	
+	public void hide()
+	{
+		this.officesModule.hide();
+		rootPanel.setVisible(false);
 	}
 
 }

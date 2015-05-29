@@ -1,13 +1,34 @@
 package com.semenov.web.gwt.country.client;
 
+import static com.google.gwt.dom.client.BrowserEvents.CLICK;
+
+import java.util.ArrayList;
+
+import com.google.gwt.cell.client.AbstractCell;
+import com.google.gwt.cell.client.AbstractEditableCell;
+import com.google.gwt.cell.client.AbstractInputCell;
 import com.google.gwt.cell.client.ButtonCell;
+import com.google.gwt.cell.client.Cell;
+import com.google.gwt.cell.client.CheckboxCell;
 import com.google.gwt.cell.client.ClickableTextCell;
+import com.google.gwt.cell.client.EditTextCell;
 import com.google.gwt.cell.client.FieldUpdater;
+import com.google.gwt.cell.client.TextCell;
+import com.google.gwt.cell.client.TextInputCell;
+import com.google.gwt.cell.client.ValueUpdater;
+import com.google.gwt.cell.client.Cell.Context;
+import com.google.gwt.cell.client.TextInputCell.ViewData;
 import com.google.gwt.core.client.EntryPoint;
+import com.google.gwt.dom.client.BrowserEvents;
+import com.google.gwt.dom.client.Element;
+import com.google.gwt.dom.client.InputElement;
+import com.google.gwt.dom.client.NativeEvent;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.TextColumn;
@@ -21,102 +42,73 @@ import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.http.client.RequestException;
+import com.semenov.web.gwt.region.client.Regions;
 
 /**
  * <code>countries.html</code> entry point
  * 
  * @author Roman Semenov <romansemenov3@gmail.com>
  */
-public class Countries implements EntryPoint {	
+public class Countries {	
 	
 	private final CellTable<CountryGWT> countries = new CellTable<CountryGWT>();
+	private final HeaderTable headerTable = new HeaderTable();
+	private final RootPanel rootPanel = RootPanel.get("countries");
+	private Regions regionsModule;
 	private int pageLength = 10;
 	private int pageNumber = 0;
 	
-	/**
-	 * Data editor popup panel
-	 */
-	private class CountryEditPanel extends PopupPanel
+	private class HeaderTable extends FlexTable
 	{
-		/**
-		 * Table with editor components
-		 */
-		private class DataTable extends FlexTable
+		private class SaveEditButton extends Button
 		{
-			private Button save;
-			private Button cancel;
+			private boolean isEditing = false;
 			
-			private TextBox name;
-			
-			public DataTable(final CountryGWT country)
+			public SaveEditButton()
 			{
-				name = new TextBox();
-				name.setValue(country.getName());
-				
-				save = new Button("Save");
-				save.addClickHandler(new ClickHandler(){
+				super("Edit");
+				addClickHandler(new ClickHandler() {
 					@Override
-					public void onClick(ClickEvent event) {
+					public void onClick(ClickEvent event) {					
 						try {
-							country.setName(name.getValue());
-							CountryFacadeGWT.edit(pageLength, pageNumber, country, countries);
-							hide();
+							if(isEditing)
+							{
+								for(CountryGWT object : countries.getVisibleItems())
+									if(object.isEditing())
+									{
+										CountryFacadeGWT.edit(pageLength, pageNumber, object, countries);
+										object.setEditing(false);
+									}
+								
+								setText("Edit");								
+							}
+							else
+							{
+								for(CountryGWT object : countries.getVisibleItems())
+								{
+									object.setEditing(object.isChecked());
+									object.setChecked(false);
+								}
+								
+								setText("Save");
+							}
+							
+							isEditing = !isEditing;
+							countries.redraw();
+							
 						} catch (RequestException e) {
-							RootPanel.get().add(new Label("EditRequestError: " + e.getMessage()));
+							rootPanel.add(new Label("AddRequestError: " + e.getMessage()));
 						}
 					}
 				});
-				
-				cancel = new Button("Cancel");
-				cancel.addClickHandler(new ClickHandler(){
-					@Override
-					public void onClick(ClickEvent event) {					
-						hide();
-					}
-				});
-				
-				Object[][] rowData = { 
-					{new Label("Column Name"), new Label("Column Value")},
-					{new Label("Country ID"), new Label(country.getID())},
-					{new Label("Country Name"), name},
-					{save, cancel},
-				};
-				
-				for(int row = 0; row < rowData.length; ++row)
-					for (int column = 0; column < 2; ++column)
-						setWidget(row, column, (Widget) rowData[row][column]);
-				
-				this.getCellFormatter().setStylePrimaryName(0, 0, "popupTableHeader");
-				this.getCellFormatter().setStylePrimaryName(0, 1, "popupTableHeader");
-
-				int lastRow = rowData.length - 1;
-				for(int row = 1; row < lastRow; ++row)
-				{
-					this.getCellFormatter().setStylePrimaryName(row, 0, "popupColumnName");
-					this.getCellFormatter().setStylePrimaryName(row, 1, "popupColumnValue");
-				}
-						
-				this.getCellFormatter().setStylePrimaryName(lastRow, 0, "popupColumnButton");
-				this.getCellFormatter().setStylePrimaryName(lastRow, 1, "popupColumnButton");
-				
-				this.setStylePrimaryName("popupTable");
-			}
+			}			
 		}
 		
-		public CountryEditPanel(final CountryGWT country)
-		{
-			super(false);
-			this.center();
-			this.add(new DataTable(country));
-			this.setStylePrimaryName("popupDiv");
-		}
-	}
-	
-	private class HeaderTable extends FlexTable
-	{
 		private final Button addButton = new Button("Add Country");
 		private final ListBox pageNumberListBox = new ListBox();
 		private final ListBox pageLengthListBox = new ListBox();
+		private final SaveEditButton saveEditButton = new SaveEditButton();
+		private final Button deleteButton = new Button("Delete");
 		
 		private void pageNumberListBoxChange()
 		{
@@ -144,7 +136,7 @@ public class Countries implements EntryPoint {
 						pageNumberListBoxChange();
 						CountryFacadeGWT.add(pageLength, pageNumber, countries);
 					} catch (RequestException e) {
-						RootPanel.get().add(new Label("AddRequestError: " + e.getMessage()));
+						rootPanel.add(new Label("AddRequestError: " + e.getMessage()));
 					}
 				}
 			});
@@ -168,11 +160,58 @@ public class Countries implements EntryPoint {
 			});
 			CountryFacadeGWT.updatePageList(pageLength, pageNumberListBox);
 			
+			deleteButton.addClickHandler(new ClickHandler() {
+				@Override
+				public void onClick(ClickEvent event) {					
+					try {
+						for(CountryGWT object : countries.getVisibleItems())
+							if(object.isChecked())
+								CountryFacadeGWT.delete(pageLength, pageNumber, object, countries);
+						
+					} catch (RequestException e) {
+						rootPanel.add(new Label("AddRequestError: " + e.getMessage()));
+					}
+				}
+			});
+			
 			setWidget(0, 0, addButton);
 			setWidget(0, 1, pageLengthListBox);
 			setWidget(0, 2, pageNumberListBox);
+			setWidget(0, 3, saveEditButton);
+			setWidget(0, 4, deleteButton);
 			
 			this.setStylePrimaryName("headerTable");
+		}
+	}
+	
+	private class LabelInputCell extends AbstractCell<String>
+	{
+		private TextInputCell inputCell;
+		private ClickableTextCell textCell;
+		
+		public LabelInputCell()
+		{
+			super(BrowserEvents.CHANGE, BrowserEvents.KEYUP, BrowserEvents.CLICK, BrowserEvents.KEYDOWN);
+			
+			inputCell = new TextInputCell();
+			textCell = new ClickableTextCell();
+		}
+		
+		@Override
+		public void render(com.google.gwt.cell.client.Cell.Context context,	String value, SafeHtmlBuilder sb) {
+			if(countries.getVisibleItem(context.getIndex()).isEditing())
+				inputCell.render(context, value, sb);
+			else
+				textCell.render(context, value, sb);
+		}
+		
+		@Override
+		public void onBrowserEvent(Context context, Element parent, String value, NativeEvent event, ValueUpdater<String> valueUpdater) {			
+			//super.onBrowserEvent(context, parent, value, event, valueUpdater);			
+			if(countries.getVisibleItem(context.getIndex()).isEditing())
+				inputCell.onBrowserEvent(context, parent, value, event, valueUpdater);
+			else
+				textCell.onBrowserEvent(context, parent, value, event, valueUpdater);
 		}
 	}
 	
@@ -193,70 +232,55 @@ public class Countries implements EntryPoint {
 		this.countries.addColumn(id, "Country ID");
 		
 		//"Country Name" row
-		ClickableTextCell nameCell = new ClickableTextCell();
+		LabelInputCell nameCell = new LabelInputCell();
 		Column<CountryGWT, String> name = new Column<CountryGWT, String>(nameCell) {
 			@Override
 			public String getValue(CountryGWT object) {
 				return object.getName();
-			}			
+			}
 	    };
 	    name.setFieldUpdater(new FieldUpdater<CountryGWT, String>() {
 			@Override
 			public void update(int index, CountryGWT object, String value) {
-				Window.open("../region/regions.html?country_id=" + object.getID(), "_blank", "");
+				if(object.isEditing())
+					object.setName(value);
+				else
+					regionsModule.show(object.getID());
 			}
 	    });
 	    this.countries.addColumn(name, "Country Name");
 		
-		//"Edit Country" row
-		ButtonCell editCell = new ButtonCell();
-		Column<CountryGWT, String> edit = new Column<CountryGWT, String>(editCell) {
+		//"Choose Country" row
+		CheckboxCell checkboxCell = new CheckboxCell();
+		Column<CountryGWT, Boolean> check = new Column<CountryGWT, Boolean>(checkboxCell) {
 			@Override
-			public String getValue(CountryGWT object) {
-				return "Edit " + object.getName();
-			}			
+			public Boolean getValue(CountryGWT object) {
+				return object.isChecked();
+			}					
 	    };
-	    edit.setFieldUpdater(new FieldUpdater<CountryGWT, String>() {
+	    check.setFieldUpdater(new FieldUpdater<CountryGWT, Boolean>() {
 			@Override
-			public void update(int index, CountryGWT object, String value) {					
-				new CountryEditPanel(object).show();
+			public void update(int index, CountryGWT object, Boolean value) {
+				object.setChecked(value);
 			}
 	    });
-	    this.countries.addColumn(edit, "Edit Country");
-		
-		//"Delete Country" row
-		ButtonCell deleteCell = new ButtonCell();
-		Column<CountryGWT, String> delete = new Column<CountryGWT, String>(deleteCell) {
-			@Override
-			public String getValue(CountryGWT object) {
-				return "Delete " + object.getName();
-			}			
-	    };
-	    delete.setFieldUpdater(new FieldUpdater<CountryGWT, String>() {
-			@Override
-			public void update(int index, CountryGWT object, String value) {					
-				try {
-					CountryFacadeGWT.delete(pageLength, pageNumber, object, countries);
-				} catch (RequestException e) {
-					RootPanel.get().add(new Label("DeleteRequestError: " + e.getMessage()));
-				}
-			}
-	    });
-	    this.countries.addColumn(delete, "Delete Country");
-	}	
+	    this.countries.addColumn(check, "Choose Country");
+	}
 	
-	@Override
-	public void onModuleLoad() {
+	public Countries(Regions regionsModule)
+	{
 		try {
+			this.regionsModule = regionsModule;
+			
 			buildTable();
 			CountryFacadeGWT.load(pageLength, pageNumber, this.countries);
 			
-			RootPanel.get().add(new HeaderTable());
-			RootPanel.get().add(this.countries);
+			rootPanel.add(this.headerTable);
+			rootPanel.add(this.countries);
 			
 		} catch (RequestException e) {
 			
 		}
 	}
-
+	
 }

@@ -3,5 +3,4 @@
 <module rename-to="regions">
 	<inherits name="com.google.gwt.user.User" />
 	<source path="client" />
-	<entry-point class="com.semenov.web.gwt.region.client.Regions"></entry-point>
 </module>

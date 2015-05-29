@@ -23,12 +23,11 @@ import com.google.gwt.user.client.ui.RootPanel;
  */
 public class OfficeFacadeGWT {
 	
-	private static final String JSON_URL = "json";
-	private static final String EXTERNAL_JSON_URL = "../office/json";
+	private static final String JSON_URL = "office/json";
 	
-	private static final String EDIT_URL = "edit";
-	private static final String DELETE_URL = "delete";
-	private static final String ADD_URL = "add";
+	private static final String EDIT_URL = "office/edit";
+	private static final String DELETE_URL = "office/delete";
+	private static final String ADD_URL = "office/add";
 	
 	/**
 	 * Office representation for JSON
@@ -204,7 +203,7 @@ public class OfficeFacadeGWT {
 	
 	public static void fillOfficesList(final String region_id, final ListBox target, final String choose)
 	{
-		String url = OfficeFacadeGWT.EXTERNAL_JSON_URL + "?region_id=" + region_id;
+		String url = OfficeFacadeGWT.JSON_URL + "?region_id=" + region_id;
 		
 		RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, url);
 		try {

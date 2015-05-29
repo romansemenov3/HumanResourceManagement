@@ -3,5 +3,4 @@
 <module rename-to="countries">
 	<inherits name="com.google.gwt.user.User" />
 	<source path="client" />
-	<entry-point class="com.semenov.web.gwt.country.client.Countries"/>
 </module>

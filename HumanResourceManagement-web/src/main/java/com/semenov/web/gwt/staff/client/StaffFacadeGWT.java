@@ -26,10 +26,10 @@ import com.semenov.web.gwt.region.client.RegionFacadeGWT;
  */
 public class StaffFacadeGWT {
 	
-	private static final String JSON_URL = "json";
-	private static final String EDIT_URL = "edit";
-	private static final String DELETE_URL = "delete";
-	private static final String ADD_URL = "add";
+	private static final String JSON_URL = "staff/json";
+	private static final String EDIT_URL = "staff/edit";
+	private static final String DELETE_URL = "staff/delete";
+	private static final String ADD_URL = "staff/add";
 	
 	/**
 	 * Staff representation for JSON

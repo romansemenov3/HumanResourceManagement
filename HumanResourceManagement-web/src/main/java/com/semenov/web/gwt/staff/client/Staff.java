@@ -30,9 +30,11 @@ import com.semenov.web.gwt.region.client.RegionFacadeGWT;
  * 
  * @author Roman Semenov <romansemenov3@gmail.com>
  */
-public class Staff implements EntryPoint {
+public class Staff {
 
 	private final CellTable<StaffGWT> offices = new CellTable<StaffGWT>();
+	private final HeaderTable headerTable = new HeaderTable();
+	private final RootPanel rootPanel = RootPanel.get("staff");
 	private int pageLength = 10;
 	private int pageNumber = 0;
 	
@@ -100,7 +102,7 @@ public class Staff implements EntryPoint {
 							StaffFacadeGWT.edit(office_id, pageLength, pageNumber, staff, offices);
 							hide();
 						} catch (RequestException e) {
-							RootPanel.get().add(new Label("EditRequestError: " + e.getMessage()));
+							rootPanel.add(new Label("EditRequestError: " + e.getMessage()));
 						}
 					}
 				});
@@ -188,7 +190,7 @@ public class Staff implements EntryPoint {
 						pageNumberListBoxChange();
 						StaffFacadeGWT.add(office_id, pageLength, pageNumber, offices);
 					} catch (RequestException e) {
-						RootPanel.get().add(new Label("AddRequestError: " + e.getMessage()));
+						rootPanel.add(new Label("AddRequestError: " + e.getMessage()));
 					}
 				}
 			});
@@ -209,14 +211,19 @@ public class Staff implements EntryPoint {
 				public void onChange(ChangeEvent event) {
 					pageNumberListBoxChange();
 				}				
-			});
-			StaffFacadeGWT.updatePageList(office_id, pageLength, pageNumberListBox);
+			});			
 			
 			setWidget(0, 0, addButton);
 			setWidget(0, 1, pageLengthListBox);
 			setWidget(0, 2, pageNumberListBox);
 			
 			this.setStylePrimaryName("headerTable");
+		}
+		
+		public void show()
+		{
+			StaffFacadeGWT.updatePageList(office_id, pageLength, pageNumberListBox);
+			pageNumberListBox.setSelectedIndex(0);
 		}
 	}
 	
@@ -286,26 +293,42 @@ public class Staff implements EntryPoint {
 				try {
 					StaffFacadeGWT.delete(office_id, pageLength, pageNumber, object, offices);
 				} catch (RequestException e) {
-					RootPanel.get().add(new Label("DeleteRequestError: " + e.getMessage()));
+					rootPanel.add(new Label("DeleteRequestError: " + e.getMessage()));
 				}
 			}
 	    });
 	    this.offices.addColumn(delete, "Delete Staff");
 	}
 	
-	@Override
-	public void onModuleLoad() {
-		try {
-			office_id = Window.Location.getParameter("office_id");
+	public Staff() {
+		try {			
+			buildTable();			
 			
-			buildTable();
-			StaffFacadeGWT.load(office_id, pageLength, pageNumber, this.offices);
+			rootPanel.add(new HeaderTable());
+			rootPanel.add(this.offices);
 			
-			RootPanel.get().add(new HeaderTable());
-			RootPanel.get().add(this.offices);
+			hide();
 			
 		} catch (RequestException e) {
 			
 		}
+	}
+	
+	public void show(String office_id)
+	{
+		this.office_id = office_id;
+		this.pageNumber = 0;
+		this.pageLength = 10;		
+		
+		this.headerTable.show();
+		
+		StaffFacadeGWT.load(office_id, pageLength, pageNumber, this.offices);
+		
+		rootPanel.setVisible(true);
+	}
+	
+	public void hide()
+	{
+		rootPanel.setVisible(false);
 	}
 }

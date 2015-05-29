@@ -16,6 +16,14 @@ public class CountryGWT {
 	 * Country name
 	 */
 	private String name;
+	/**
+	 * Country is checked
+	 */
+	private boolean isChecked;
+	/**
+	 * Country is editing	
+	 */
+	private boolean isEditing;
 	
 	public CountryGWT(String id, String name)
 	{
@@ -46,5 +54,25 @@ public class CountryGWT {
 	public String getDeleteData()
 	{
 		return "id=" + URL.encode(this.getID());
+	}
+	
+	public void setChecked(boolean isChecked)
+	{
+		this.isChecked = isChecked;
+	}
+	
+	public boolean isChecked()
+	{
+		return this.isChecked;
+	}
+	
+	public void setEditing(boolean isEditing)
+	{
+		this.isEditing = isEditing;
+	}
+	
+	public boolean isEditing()
+	{
+		return this.isEditing;
 	}
 }

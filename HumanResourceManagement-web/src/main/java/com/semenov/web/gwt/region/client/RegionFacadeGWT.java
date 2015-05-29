@@ -23,12 +23,11 @@ import com.google.gwt.user.client.ui.RootPanel;
  */
 public class RegionFacadeGWT {
 	
-	private static final String JSON_URL = "json";
-	private static final String EXTERNAL_JSON_URL = "../region/json";
+	private static final String JSON_URL = "region/json";
 	
-	private static final String EDIT_URL = "edit";
-	private static final String DELETE_URL = "delete";
-	private static final String ADD_URL = "add";
+	private static final String EDIT_URL = "region/edit";
+	private static final String DELETE_URL = "region/delete";
+	private static final String ADD_URL = "region/add";
 	
 	/**
 	 * Region representation for JSON
@@ -204,7 +203,7 @@ public class RegionFacadeGWT {
 	
 	public static void fillRegionsList(final String country_id, final ListBox target, final String choose)
 	{
-		String url = RegionFacadeGWT.EXTERNAL_JSON_URL + "?country_id=" + country_id;
+		String url = RegionFacadeGWT.JSON_URL + "?country_id=" + country_id;
 		
 		RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, url);
 		try {

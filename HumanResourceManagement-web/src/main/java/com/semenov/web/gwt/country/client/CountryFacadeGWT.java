@@ -23,12 +23,11 @@ import com.google.gwt.user.client.ui.RootPanel;
  */
 public class CountryFacadeGWT {
 	
-	private static final String JSON_URL = "json";
-	private static final String EXTERNAL_JSON_URL = "../country/json";
+	private static final String JSON_URL = "country/json";
 	
-	private static final String EDIT_URL = "edit";
-	private static final String DELETE_URL = "delete";
-	private static final String ADD_URL = "add";
+	private static final String EDIT_URL = "country/edit";
+	private static final String DELETE_URL = "country/delete";
+	private static final String ADD_URL = "country/add";
 	
 	/**
 	 * Country representation for JSON
@@ -204,7 +203,7 @@ public class CountryFacadeGWT {
 	
 	public static void fillCountriesList(final ListBox target, final String choose)
 	{
-		RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, CountryFacadeGWT.EXTERNAL_JSON_URL);
+		RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, CountryFacadeGWT.JSON_URL);
 		try {
 			builder.sendRequest(null, new RequestCallback() 
 				{

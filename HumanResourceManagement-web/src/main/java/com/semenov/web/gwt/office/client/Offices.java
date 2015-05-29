@@ -21,15 +21,20 @@ import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.http.client.RequestException;
+import com.semenov.web.gwt.region.client.RegionFacadeGWT;
+import com.semenov.web.gwt.staff.client.Staff;
 
 /**
  * <code>offices.html</code> entry point
  * 
  * @author Roman Semenov <romansemenov3@gmail.com>
  */
-public class Offices implements EntryPoint {	
+public class Offices {	
 	
 	private final CellTable<OfficeGWT> offices = new CellTable<OfficeGWT>();
+	private final HeaderTable headerTable = new HeaderTable();
+	private final RootPanel rootPanel = RootPanel.get("offices");
+	private Staff staffModule;
 	private int pageLength = 10;
 	private int pageNumber = 0;
 	
@@ -64,7 +69,7 @@ public class Offices implements EntryPoint {
 							OfficeFacadeGWT.edit(region_id, pageLength, pageNumber, office, offices);
 							hide();
 						} catch (RequestException e) {
-							RootPanel.get().add(new Label("EditRequestError: " + e.getMessage()));
+							rootPanel.add(new Label("EditRequestError: " + e.getMessage()));
 						}
 					}
 				});
@@ -146,7 +151,7 @@ public class Offices implements EntryPoint {
 						pageNumberListBoxChange();
 						OfficeFacadeGWT.add(region_id, pageLength, pageNumber, offices);
 					} catch (RequestException e) {
-						RootPanel.get().add(new Label("AddRequestError: " + e.getMessage()));
+						rootPanel.add(new Label("AddRequestError: " + e.getMessage()));
 					}
 				}
 			});
@@ -168,13 +173,18 @@ public class Offices implements EntryPoint {
 					pageNumberListBoxChange();
 				}				
 			});
-			OfficeFacadeGWT.updatePageList(region_id, pageLength, pageNumberListBox);
 			
 			setWidget(0, 0, addButton);
 			setWidget(0, 1, pageLengthListBox);
 			setWidget(0, 2, pageNumberListBox);
 			
 			this.setStylePrimaryName("headerTable");
+		}
+		
+		public void show()
+		{
+			OfficeFacadeGWT.updatePageList(region_id, pageLength, pageNumberListBox);
+			pageNumberListBox.setSelectedIndex(0);
 		}
 	}
 	
@@ -205,7 +215,7 @@ public class Offices implements EntryPoint {
 	    name.setFieldUpdater(new FieldUpdater<OfficeGWT, String>() {
 			@Override
 			public void update(int index, OfficeGWT object, String value) {
-				Window.open("../staff/staff.html?office_id=" + object.getID(), "_blank", "");
+				staffModule.show(object.getID());
 			}
 	    });
 	    this.offices.addColumn(name, "Office Name");
@@ -240,26 +250,46 @@ public class Offices implements EntryPoint {
 				try {
 					OfficeFacadeGWT.delete(region_id, pageLength, pageNumber, object, offices);
 				} catch (RequestException e) {
-					RootPanel.get().add(new Label("DeleteRequestError: " + e.getMessage()));
+					rootPanel.add(new Label("DeleteRequestError: " + e.getMessage()));
 				}
 			}
 	    });
 	    this.offices.addColumn(delete, "Delete Office");
 	}
 	
-	@Override
-	public void onModuleLoad() {
+	public Offices(Staff staffModule) {
 		try {
-			region_id = Window.Location.getParameter("region_id");
+			this.staffModule = staffModule;
 			
-			buildTable();
-			OfficeFacadeGWT.load(region_id, pageLength, pageNumber, this.offices);
+			buildTable();			
 			
-			RootPanel.get().add(new HeaderTable());
-			RootPanel.get().add(this.offices);
+			rootPanel.add(new HeaderTable());
+			rootPanel.add(this.offices);
+			
+			hide();
 			
 		} catch (RequestException e) {
 			
 		}
+	}
+	
+	public void show(String region_id)
+	{
+		this.region_id = region_id;
+		this.pageNumber = 0;
+		this.pageLength = 10;
+		
+		this.headerTable.show();
+		
+		OfficeFacadeGWT.load(region_id, pageLength, pageNumber, this.offices);
+		
+		this.staffModule.hide();
+		rootPanel.setVisible(true);
+	}
+	
+	public void hide()
+	{
+		this.staffModule.hide();
+		this.rootPanel.setVisible(false);
 	}
 }

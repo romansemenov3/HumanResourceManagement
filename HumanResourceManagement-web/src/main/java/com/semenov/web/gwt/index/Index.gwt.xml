@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE module PUBLIC "-//Google Inc.//DTD Google Web Toolkit 2.7.0//EN" "http://google-web-toolkit.googlecode.com/svn/tags/2.7.0/distro-source/core/src/gwt-module.dtd">
-<module rename-to="staff">
+<module rename-to="index">
 	<inherits name="com.google.gwt.user.User" />
 	<inherits name="com.semenov.web.gwt.country.Countries" />
 	<inherits name="com.semenov.web.gwt.region.Regions" />
 	<inherits name="com.semenov.web.gwt.office.Offices" />
+	<inherits name="com.semenov.web.gwt.staff.Staff" />
 	<source path="client" />
+	<entry-point class="com.semenov.web.gwt.index.client.Index"></entry-point>
 </module>

@@ -3,5 +3,4 @@
 <module rename-to="offices">
 	<inherits name="com.google.gwt.user.User" />
 	<source path="client" />
-	<entry-point class="com.semenov.web.gwt.office.client.Offices"></entry-point>
 </module>

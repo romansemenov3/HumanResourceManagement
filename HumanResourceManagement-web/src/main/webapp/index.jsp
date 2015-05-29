@@ -11,18 +11,15 @@
 <html>
     <meta charset="utf-8">
     <head>
+	    <script type="text/javascript" language="javascript" src="index/index.nocache.js"></script>
+	    <link rel="stylesheet" href="style/countries.css">
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>Human Resource Management</title>
     </head>
     <body>
-        <c:choose>
-            <c:when test="${content == null}">
-                <a href="country/countries.html">Editor</a><br/>
-                <a href="import/import.jsp">Import</a><br/>
-            </c:when>
-            <c:otherwise>                
-                <c:import url="${content}" />
-            </c:otherwise>
-        </c:choose>
+        <div id="countries" class="moduleDiv"></div>
+        <div id="regions" class="moduleDiv"></div>
+        <div id="offices" class="moduleDiv"></div>
+        <div id="staff" class="moduleDiv"></div>
     </body>
 </html>
